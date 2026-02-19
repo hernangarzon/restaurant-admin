@@ -16,12 +16,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        // Token expirado o inválido — limpiar sesión y redirigir
+      // Solo cerrar sesión si es 401 en rutas protegidas
+      // NO cerrar sesión en cambiar-password (puede ser password incorrecta)
+      if (error.status === 401 && !req.url.includes('/cambiar-password')) {
         authService.logout();
         router.navigate(['/login']);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
