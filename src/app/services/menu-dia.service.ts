@@ -1,11 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { MenuDia } from '../models/menu-dia.model';
+import { API_URL } from './api.config';
 
 @Injectable({ providedIn: 'root' })
 export class MenuDiaService {
 
-  private baseUrl = 'http://localhost:8091/admin/menus';
+  private baseUrl = API_URL;
 
   constructor(private http: HttpClient) {}
 

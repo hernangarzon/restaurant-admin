@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cliente } from '../models/cliente.model';
 import { Pedido } from '../models/pedido.model';
+import { API_URL } from './api.config';
 
 export interface Estadisticas {
   totalPedidos: number;
@@ -18,7 +19,7 @@ export interface Estadisticas {
   providedIn: 'root'
 })
 export class BotApiService {
-  private baseUrl = 'http://localhost:8091';
+  private baseUrl = API_URL;
 
   constructor(private http: HttpClient) {}
 
