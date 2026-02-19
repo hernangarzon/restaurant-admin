@@ -6,7 +6,7 @@ import { API_URL } from './api.config';
 @Injectable({ providedIn: 'root' })
 export class MenuDiaService {
 
-  private baseUrl = API_URL;
+  private baseUrl = `${API_URL}/admin/menus`;
 
   constructor(private http: HttpClient) {}
 
