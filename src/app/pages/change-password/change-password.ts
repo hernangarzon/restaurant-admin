@@ -46,7 +46,7 @@ export class ChangePasswordComponent {
 
     this.loading = true;
 
-    const adminId = 8; // o traerlo de la sesión si quieres
+    const adminId = Number(localStorage.getItem('admin_id'));
     const body = { adminId, passwordActual, nuevaPassword };
 
     // Petición POST, forzando responseType JSON
