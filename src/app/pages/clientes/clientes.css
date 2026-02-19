@@ -1,0 +1,9 @@
+.badge.activo {
+  background-color: #16a34a;
+  color: white;
+}
+
+.badge.inactivo {
+  background-color: #6b7280;
+  color: white;
+}

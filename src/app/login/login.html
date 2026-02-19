@@ -1,0 +1,87 @@
+<div class="login-container">
+  <div class="login-card">
+    
+    <!-- Encabezado con logo bonito -->
+    <div class="login-header">
+      <div class="logo-container">
+        <span class="logo">🍽️</span>
+      </div>
+      <h1 class="title">Restaurant Admin</h1>
+      <p class="subtitle">Sistema de Administración</p>
+    </div>
+
+    <!-- Mensaje de error elegante -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+      
+      <!-- Campo Usuario -->
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <div class="input-container">
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            id="username"
+            [(ngModel)]="username"
+            name="username"
+            placeholder="admin@restaurant.com"
+            class="form-control"
+            [disabled]="loading"
+            required
+            autocomplete="username"
+            autofocus
+          />
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="input-container">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            class="form-control"
+            [disabled]="loading"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+      </div>
+
+      <!-- Botón de Login -->
+      <button
+        type="submit"
+        class="btn-login"
+        [disabled]="loading || !username.trim() || !password.trim()"
+      >
+        <span *ngIf="!loading">🚀 Iniciar Sesión</span>
+        <span *ngIf="loading">
+          <span class="spinner"></span>
+          Accediendo...
+        </span>
+      </button>
+
+    </form>
+
+    <!-- Footer del login -->
+    <div class="login-footer">
+      <p>
+        <span class="brand">RESTAURANT ADMIN</span>
+        <span class="version">v2.0</span>
+      </p>
+      <p style="margin-top: 8px; font-size: 13px; opacity: 0.7;">
+        Sistema de gestión integral para restaurantes
+      </p>
+    </div>
+
+  </div>
+</div>

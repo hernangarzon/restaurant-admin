@@ -1,0 +1,77 @@
+<div class="dashboard-container">
+  
+  <!-- Header del Dashboard -->
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p class="dashboard-subtitle">Resumen general y métricas de tu restaurante</p>
+  </div>
+
+  <!-- Tarjetas de estadísticas principales -->
+  <div class="cards-grid">
+    
+    <!-- Pedidos Hoy -->
+    <div class="stat-card">
+      <h3>Pedidos Hoy</h3>
+      <div class="card-value">{{ pedidosHoy }}</div>
+      <div class="card-change positive">
+        <span>↑ 12% vs ayer</span>
+      </div>
+    </div>
+
+    
+  </div>
+
+  <!-- Estados de Pedidos -->
+  <h2 class="section-title">Estados de Pedidos</h2>
+  
+  <div class="estados-grid">
+    <div class="estado-card" *ngFor="let e of porEstado | keyvalue" [attr.data-estado]="e.key">
+      <span class="estado-nombre">{{ e.key }}</span>
+      <span class="estado-valor">{{ e.value }}</span>
+    </div>
+  </div>
+
+  <!-- Sección de gráficos (opcional - puedes agregar después) -->
+  <!--
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3>📈 Pedidos por Hora</h3>
+      <canvas id="pedidosChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>🍽️ Productos Más Vendidos</h3>
+      <canvas id="productosChart"></canvas>
+    </div>
+  </div>
+  -->
+
+  <!-- Últimos pedidos (opcional) -->
+  <!--
+  <div class="recent-orders">
+    <h2 class="section-title">🔄 Últimos Pedidos</h2>
+    <div class="orders-table">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of ultimosPedidos">
+            <td>#{{ order.id }}</td>
+            <td>{{ order.cliente }}</td>
+            <td>${{ order.total }}</td>
+            <td><span class="status-badge" [class]="order.estado">{{ order.estado }}</span></td>
+            <td>{{ order.hora }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  -->
+
+</div>

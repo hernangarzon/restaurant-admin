@@ -1,0 +1,7 @@
+export enum EstadoPedido {
+  NUEVO = 'NUEVO',
+  EN_PREPARACION = 'EN_PREPARACION',
+  LISTO = 'LISTO',
+  ENTREGADO = 'ENTREGADO',
+  CANCELADO = 'CANCELADO'
+}

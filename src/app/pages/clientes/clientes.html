@@ -1,0 +1,11 @@
+<h1>👥 Clientes</h1>
+
+<ul *ngIf="clientes.length > 0; else sinClientes">
+  <li *ngFor="let c of clientes">
+    {{ c.nombre }} - {{ c.telefono }}
+  </li>
+</ul>
+
+<ng-template #sinClientes>
+  <p>No hay clientes registrados</p>
+</ng-template>

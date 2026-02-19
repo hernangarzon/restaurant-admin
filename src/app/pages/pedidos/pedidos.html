@@ -1,0 +1,237 @@
+
+<h1 class="title">🧾 Pedidos</h1>
+
+<!-- Cargando inicial -->
+<div *ngIf="cargandoInicial" class="cargando">
+  🔄 Cargando pedidos...
+</div>
+
+<!-- Actualizando -->
+<div *ngIf="!cargandoInicial && actualizando" class="actualizando">
+  🔄 Actualizando...
+</div>
+
+<!-- ✅ FILTROS SIEMPRE VISIBLES -->
+<!-- ✅ FILTROS SIEMPRE VISIBLES -->
+<div class="filtros-container">
+  <!-- Búsqueda por teléfono -->
+  <div class="search-wrapper">
+    <input 
+      type="text" 
+      placeholder="🔍 Buscar por teléfono..." 
+      #inputTelefono
+      (input)="buscarPorTelefono(inputTelefono.value)"
+      class="search-input"
+      [value]="filtroTelefono"
+    />
+    <button 
+      class="clear-search" 
+      (click)="limpiarBusquedaTelefono()" 
+      *ngIf="filtroTelefono"
+      title="Limpiar búsqueda"
+    >
+      ×
+    </button>
+  </div>
+  
+  <select #selectEstado (change)="filtrarEstado(selectEstado.value)">
+    <option value="">Todos los estados</option>
+    <option value="NUEVO">Nuevo</option>
+    <option value="EN_PREPARACION">En preparación</option>
+    <option value="LISTO">Listo</option>
+    <option value="ENTREGADO">Entregado</option>
+  </select>
+
+  <select #selectFecha (change)="filtrarFecha(selectFecha.value)">
+    <option value="TODOS">Todos los días</option>
+    <option value="HOY">Solo hoy</option>
+    <option value="AYER">Ayer</option>
+    <option value="ULTIMA_SEMANA">Última semana</option>
+  </select>
+</div>
+
+<!-- (OPCIONAL) Contador de resultados -->
+<div class="resultados-info" *ngIf="!cargandoInicial && pedidos.length > 0">
+  <span class="badge info">
+    📊 {{ pedidos.length }} pedido{{ pedidos.length !== 1 ? 's' : '' }} encontrado{{ pedidos.length !== 1 ? 's' : '' }}
+    <span *ngIf="filtroTelefono"> • Teléfono: {{ filtroTelefono }}</span>
+    <span *ngIf="estadoFiltro"> • Estado: {{ estadoFiltro.replace('_', ' ') }}</span>
+    <span *ngIf="fechaFiltro !== 'TODOS'"> • {{ obtenerTextoFiltroFecha() }}</span>
+  </span>
+</div>
+
+<!-- ✅ TABLA SOLO SI HAY DATOS -->
+<div *ngIf="!cargandoInicial && pedidos.length > 0">
+  <!-- ... tu tabla actual ... -->
+</div>
+
+<!-- Mensaje vacío -->
+<div *ngIf="!cargandoInicial && pedidos.length === 0" class="no-results">
+  <p *ngIf="filtroTelefono || estadoFiltro || fechaFiltro !== 'TODOS'">
+    🧐 No se encontraron pedidos con los filtros aplicados
+    <button class="btn-link" (click)="limpiarTodosFiltros()">Limpiar filtros</button>
+  </p>
+  <p *ngIf="!filtroTelefono && !estadoFiltro && fechaFiltro === 'TODOS'">
+    No hay pedidos 🍽️
+  </p>
+</div>
+
+<!-- ✅ TABLA SOLO SI HAY DATOS -->
+<div *ngIf="!cargandoInicial && pedidos.length > 0">
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Teléfono</th>
+        <th>Nombre</th>
+        <th>📍 Descripción</th>
+        <th>Estado</th>
+        <th>Detalle</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of pedidos">
+        <td>{{ p.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ p.telefonoCliente || 'Sin teléfono' }}</td>
+        <td>{{ p.nombreCliente || '—' }}</td>
+        <td>{{ p.descripcion }}</td>
+
+        <td>
+          <span
+            *ngIf="p.estado !== 'ENTREGADO'; else finalizado"
+            class="badge estado-animado"
+            [ngClass]="p.estado.toLowerCase()"
+          >
+            {{ p.estado.replace('_', ' ') }}
+          </span>
+
+          <ng-template #finalizado>
+            <span class="badge entregado estado-finalizado">
+              ✔ Pedido Entregado
+            </span>
+          </ng-template>
+        </td>
+
+        <td>
+          <button 
+            class="btn detail-btn"
+            (click)="verDetalle(p)"
+            title="Ver detalles del pedido"
+          >
+            📋 Ver detalle
+          </button>
+        </td>
+
+        <td class="actions">
+          <button
+              class="btn primary"
+              (click)="cambiarEstado(p)"
+              [disabled]="!puedeCambiarEstado(p.estado)"
+          >
+              Cambiar estado
+          </button>
+          <button
+              class="btn danger"
+              (click)="cancelarPedido(p)"
+              *ngIf="p.estado !== 'ENTREGADO' && p.estado !== 'CANCELADO'"
+          >
+              ❌ Cancelar
+          </button>
+      </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- Mensaje vacío -->
+<div *ngIf="!cargandoInicial && pedidos.length === 0">
+  <p>No hay pedidos con ese estado 🍽️</p>
+</div>
+
+<!-- MODAL PARA DETALLES -->
+<!-- MODAL PARA DETALLES -->
+<div *ngIf="mostrarModal && pedidoSeleccionado" class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- ENVOLVER TODO en *ngIf para asegurar que pedidoSeleccionado no sea undefined -->
+    <div *ngIf="pedidoSeleccionado">
+      
+      <div class="modal-header">
+        <h2>📄 Detalle del Pedido #{{ pedidoSeleccionado.id }}</h2>
+        <button class="close-btn" (click)="cerrarModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        
+        <div class="detail-section">
+          <h3>👤 Información del Cliente</h3>
+          <p><strong>Nombre:</strong> {{ pedidoSeleccionado.nombreCliente || 'No disponible' }}</p>
+          <p><strong>Teléfono:</strong> {{ pedidoSeleccionado.telefonoCliente || 'No disponible' }}</p>
+        </div>
+        
+        <div class="detail-section">
+          <h3>🍽️ Descripción del Pedido</h3>
+          <div class="description-box">
+            {{ pedidoSeleccionado.descripcion || 'Sin descripción' }}
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>📍 Dirección de Entrega</h3>
+          <div *ngIf="pedidoSeleccionado.direccion; else sinDireccion" class="address-box">
+            📍 {{ pedidoSeleccionado.direccion }}
+          </div>
+          <ng-template #sinDireccion>
+            <div class="no-address">
+              <span class="warning-icon">⚠️</span>
+              <p>No se registró dirección de entrega</p>
+              <small>El cliente debe proporcionar dirección al confirmar el pedido</small>
+            </div>
+          </ng-template>
+        </div>
+        
+        <div class="detail-section">
+          <h3>📊 Información del Pedido</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>Fecha:</strong>
+              <span>{{ pedidoSeleccionado.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+            </div>
+            <div class="info-item">
+              <strong>Estado:</strong>
+              <span class="badge" [ngClass]="pedidoSeleccionado.estado.toLowerCase()">
+                {{ pedidoSeleccionado.estado.replace('_', ' ') }}
+              </span>
+            </div>
+            <div class="info-item" *ngIf="pedidoSeleccionado.restaurante">
+              <strong>Restaurante:</strong>
+              <span>{{ pedidoSeleccionado.restaurante.nombre }}</span>
+            </div>
+            <div class="info-item">
+              <strong>ID Pedido:</strong>
+              <span>#{{ pedidoSeleccionado.id }}</span>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn secondary" (click)="cerrarModal()">Cerrar</button>
+        <button 
+          class="btn primary" 
+          *ngIf="puedeCambiarEstado(pedidoSeleccionado.estado)"
+          (click)="cambiarEstadoDesdeModal()"
+        >
+          Avanzar estado
+        </button>
+      </div>
+      
+    </div> <!-- Fin del *ngIf="pedidoSeleccionado" -->
+    
+  </div>
+</div>
