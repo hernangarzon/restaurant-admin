@@ -1,4 +1,3 @@
-
 <h1 class="title">🧾 Pedidos</h1>
 
 <!-- Cargando inicial -->
@@ -16,24 +15,13 @@
 <div class="filtros-container">
   <!-- Búsqueda por teléfono -->
   <div class="search-wrapper">
-    <input 
-      type="text" 
-      placeholder="🔍 Buscar por teléfono..." 
-      #inputTelefono
-      (input)="buscarPorTelefono(inputTelefono.value)"
-      class="search-input"
-      [value]="filtroTelefono"
-    />
-    <button 
-      class="clear-search" 
-      (click)="limpiarBusquedaTelefono()" 
-      *ngIf="filtroTelefono"
-      title="Limpiar búsqueda"
-    >
+    <input type="text" placeholder="🔍 Buscar por teléfono..." #inputTelefono
+      (input)="buscarPorTelefono(inputTelefono.value)" class="search-input" [value]="filtroTelefono" />
+    <button class="clear-search" (click)="limpiarBusquedaTelefono()" *ngIf="filtroTelefono" title="Limpiar búsqueda">
       ×
     </button>
   </div>
-  
+
   <select #selectEstado (change)="filtrarEstado(selectEstado.value)">
     <option value="">Todos los estados</option>
     <option value="NUEVO">Nuevo</option>
@@ -100,11 +88,8 @@
         <td>{{ p.descripcion }}</td>
 
         <td>
-          <span
-            *ngIf="p.estado !== 'ENTREGADO'; else finalizado"
-            class="badge estado-animado"
-            [ngClass]="p.estado.toLowerCase()"
-          >
+          <span *ngIf="p.estado !== 'ENTREGADO'; else finalizado" class="badge estado-animado"
+            [ngClass]="p.estado.toLowerCase()">
             {{ p.estado.replace('_', ' ') }}
           </span>
 
@@ -116,31 +101,20 @@
         </td>
 
         <td>
-          <button 
-            class="btn detail-btn"
-            (click)="verDetalle(p)"
-            title="Ver detalles del pedido"
-          >
+          <button class="btn detail-btn" (click)="verDetalle(p)" title="Ver detalles del pedido">
             📋 Ver detalle
           </button>
         </td>
 
         <td class="actions">
-          <button
-              class="btn primary"
-              (click)="cambiarEstado(p)"
-              [disabled]="!puedeCambiarEstado(p.estado)"
-          >
-              Cambiar estado
+          <button class="btn primary" (click)="cambiarEstado(p)" [disabled]="!puedeCambiarEstado(p.estado)">
+            Cambiar estado
           </button>
-          <button
-              class="btn danger"
-              (click)="cancelarPedido(p)"
-              *ngIf="p.estado !== 'ENTREGADO' && p.estado !== 'CANCELADO'"
-          >
-              ❌ Cancelar
+          <button class="btn danger" (click)="cancelarPedido(p)"
+            *ngIf="p.estado !== 'ENTREGADO' && p.estado !== 'CANCELADO'">
+            ❌ Cancelar
           </button>
-      </td>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -156,30 +130,30 @@
 <!-- MODAL PARA DETALLES -->
 <div *ngIf="mostrarModal && pedidoSeleccionado" class="modal-overlay" (click)="cerrarModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    
+
     <!-- ENVOLVER TODO en *ngIf para asegurar que pedidoSeleccionado no sea undefined -->
     <div *ngIf="pedidoSeleccionado">
-      
+
       <div class="modal-header">
         <h2>📄 Detalle del Pedido #{{ pedidoSeleccionado.id }}</h2>
         <button class="close-btn" (click)="cerrarModal()">×</button>
       </div>
-      
+
       <div class="modal-body">
-        
+
         <div class="detail-section">
           <h3>👤 Información del Cliente</h3>
           <p><strong>Nombre:</strong> {{ pedidoSeleccionado.nombreCliente || 'No disponible' }}</p>
           <p><strong>Teléfono:</strong> {{ pedidoSeleccionado.telefonoCliente || 'No disponible' }}</p>
         </div>
-        
+
         <div class="detail-section">
           <h3>🍽️ Descripción del Pedido</h3>
           <div class="description-box">
             {{ pedidoSeleccionado.descripcion || 'Sin descripción' }}
           </div>
         </div>
-        
+
         <div class="detail-section">
           <h3>📍 Dirección de Entrega</h3>
           <div *ngIf="pedidoSeleccionado.direccion; else sinDireccion" class="address-box">
@@ -193,7 +167,14 @@
             </div>
           </ng-template>
         </div>
-        
+
+        <div class="detail-section" *ngIf="pedidoSeleccionado.medioPago">
+          <h3>💰 Medio de Pago</h3>
+          <div class="payment-box">
+            <span class="payment-badge">{{ pedidoSeleccionado.medioPago }}</span>
+          </div>
+        </div>
+
         <div class="detail-section">
           <h3>📊 Información del Pedido</h3>
           <div class="info-grid">
@@ -217,21 +198,18 @@
             </div>
           </div>
         </div>
-        
+
       </div>
-      
+
       <div class="modal-footer">
         <button class="btn secondary" (click)="cerrarModal()">Cerrar</button>
-        <button 
-          class="btn primary" 
-          *ngIf="puedeCambiarEstado(pedidoSeleccionado.estado)"
-          (click)="cambiarEstadoDesdeModal()"
-        >
+        <button class="btn primary" *ngIf="puedeCambiarEstado(pedidoSeleccionado.estado)"
+          (click)="cambiarEstadoDesdeModal()">
           Avanzar estado
         </button>
       </div>
-      
+
     </div> <!-- Fin del *ngIf="pedidoSeleccionado" -->
-    
+
   </div>
 </div>

@@ -6,6 +6,7 @@ export interface Pedido {
   direccion: string | null;
   estado: EstadoPedido;
   fecha: string;
+  medioPago?: string;  // 👈 NUEVO CAMPO (opcional)
   cliente: {
     id: number;
     telefono: string;

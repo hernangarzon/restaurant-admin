@@ -307,16 +307,17 @@ export class PedidosComponent implements OnInit, OnDestroy {
   }
 
   verDetalle(pedido: Pedido): void {
-    console.log('🔍 DEBUG - Pedido seleccionado:', pedido);
-    console.log('📅 Fecha:', pedido.fecha);
-    console.log('📊 Estado:', pedido.estado);
-    console.log('🆔 ID:', pedido.id);
-    console.log('📍 Dirección:', pedido.direccion);
-    console.log('📄 Descripción:', pedido.descripcion);
-    this.pedidoSeleccionado = pedido;
-    this.mostrarModal = true;
-    this.cdRef.detectChanges();
-  }
+  console.log('🔍 DEBUG - Pedido seleccionado:', pedido);
+  console.log('📅 Fecha:', pedido.fecha);
+  console.log('📊 Estado:', pedido.estado);
+  console.log('💰 Medio de pago:', pedido.medioPago); // 👈 NUEVO
+  console.log('🆔 ID:', pedido.id);
+  console.log('📍 Dirección:', pedido.direccion);
+  console.log('📄 Descripción:', pedido.descripcion);
+  this.pedidoSeleccionado = pedido;
+  this.mostrarModal = true;
+  this.cdRef.detectChanges();
+}
 
   cerrarModal(): void {
     this.mostrarModal = false;
