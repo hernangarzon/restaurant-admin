@@ -706,3 +706,32 @@ div:has(> p:only-child):not(.no-results) p::before {
   margin-right: 8px;
   font-size: 16px;
 }
+
+/* ===== ESTADO EN MODAL ===== */
+.info-item .badge {
+  all: unset !important;           /* Resetea todos los estilos */
+  background: #f8f9fa !important;   /* Fondo gris */
+  color: #2d3436 !important;        /* Texto gris oscuro */
+  padding: 0 !important;            /* Sin padding */
+  font-size: 15px !important;       /* Mismo tamaño que dirección */
+  font-weight: normal !important;   /* Sin negrita */
+  display: inline !important;       /* Misma línea */
+  border-left: none !important;     /* Sin borde izquierdo */
+  box-shadow: none !important;      /* Sin sombra */
+  border-radius: 0 !important;      /* Sin bordes redondeados */
+  text-transform: none !important;  /* Sin mayúsculas */
+}
+
+/* Color del texto según estado */
+.info-item .badge.nuevo { color: #2563eb !important; }
+.info-item .badge.en_preparacion { color: #f59e0b !important; }
+.info-item .badge.listo { color: #16a34a !important; }
+.info-item .badge.entregado { color: #0f766e !important; }
+.info-item .badge.cancelado { color: #dc2626 !important; }
+
+/* Iconos */
+.info-item .badge.nuevo::before { content: "🆕" !important; margin-right: 4px; }
+.info-item .badge.en_preparacion::before { content: "👨‍🍳" !important; margin-right: 4px; }
+.info-item .badge.listo::before { content: "✅" !important; margin-right: 4px; }
+.info-item .badge.entregado::before { content: "📦" !important; margin-right: 4px; }
+.info-item .badge.cancelado::before { content: "❌" !important; margin-right: 4px; }
