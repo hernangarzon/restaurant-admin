@@ -661,36 +661,48 @@ div:has(> p:only-child):not(.no-results) p::before {
   }
 }
 
-/* Estilos para medio de pago */
+/* Estilos para medio de pago - IGUAL QUE DIRECCIÓN */
 .payment-box {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  padding: 16px 20px;
+  background: #f8f9fa;
+  padding: 20px;
   border-radius: 12px;
-  border-left: 4px solid #2e7d32;
-  margin-top: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #3498db;
+  white-space: pre-line;
+  line-height: 1.6;
+  margin-top: 10px;
 }
 
 .payment-badge {
-  background: linear-gradient(135deg, #2e7d32, #388e3c);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+  color: #2d3436;
+  font-size: 15px;
+  font-weight: normal;
+  display: block;
+  background: none;
+  padding: 0;
+  box-shadow: none;
 }
 
-.payment-badge::before {
+/* Estilos específicos para cada medio de pago */
+.payment-badge[data-pago="EFECTIVO"]::before { 
   content: "💵";
-  font-size: 18px;
+  margin-right: 8px;
+  font-size: 16px;
 }
 
-/* Estilos específicos para cada medio de pago (opcional) */
-.payment-badge[data-pago="EFECTIVO"]::before { content: "💵"; }
-.payment-badge[data-pago="NEQUI"]::before { content: "📱"; }
-.payment-badge[data-pago="TRANSFERENCIA"]::before { content: "🏦"; }
-.payment-badge[data-pago="DATAFONO"]::before { content: "💳"; }
+.payment-badge[data-pago="NEQUI"]::before { 
+  content: "📱";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.payment-badge[data-pago="TRANSFERENCIA"]::before { 
+  content: "🏦";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.payment-badge[data-pago="DATAFONO"]::before { 
+  content: "💳";
+  margin-right: 8px;
+  font-size: 16px;
+}
