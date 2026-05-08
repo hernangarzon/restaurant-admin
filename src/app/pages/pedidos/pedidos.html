@@ -198,11 +198,15 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="modal-footer">
-        <button class="btn secondary" (click)="cerrarModal()">Cerrar</button>
+        <button class="btn btn-cerrar-chat" (click)="cerrarModal()">Cerrar</button>
+
+        <button class="btn ver-conversacion-btn" (click)="abrirChatYEdicion(pedidoSeleccionado!)">
+          💬 VER CONVERSACIÓN
+        </button>
+
         <button class="btn primary" *ngIf="puedeCambiarEstado(pedidoSeleccionado.estado)"
           (click)="cambiarEstadoDesdeModal()">
           Avanzar estado
@@ -211,5 +215,48 @@
 
     </div> <!-- Fin del *ngIf="pedidoSeleccionado" -->
 
+  </div>
+</div>
+
+<div *ngIf="mostrarModalChat && pedidoSeleccionado" class="modal-overlay" (click)="cerrarModalChat()">
+  <div class="modal-content modal-grande" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>💬 Gestión de Pedido #{{ pedidoSeleccionado.id }}</h2>
+      <button class="close-btn" (click)="cerrarModalChat()">×</button>
+    </div>
+
+    <div class="modal-body split-layout">
+      <div class="chat-column">
+        <h3>Conversación</h3>
+        <div class="messages-container" #scrollChat>
+          <div *ngFor="let msg of mensajes" [ngClass]="msg.es_cliente ? 'msg-left' : 'msg-right'">
+            <div class="bubble">{{ msg.texto }}</div>
+            <small>{{ msg.fecha | date:'shortTime' }}</small>
+          </div>
+        </div>
+        <div class="chat-footer">
+          <input [(ngModel)]="nuevoMensaje" (keyup.enter)="enviarRespuesta()" placeholder="Escribe al cliente...">
+          <button (click)="enviarRespuesta()" class="btn-send">➤</button>
+        </div>
+      </div>
+
+      <div class="edit-column">
+        <h3>Modificar Detalles</h3>
+        <label>Descripción del Pedido:</label>
+        <textarea [(ngModel)]="pedidoSeleccionado.descripcion" rows="8"></textarea>
+
+        <label>Dirección:</label>
+        <input [(ngModel)]="pedidoSeleccionado.direccion">
+
+        <button class="btn success full-width" (click)="guardarCambiosPedido()">
+          💾 Guardar Cambios
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cerrar-chat" (click)="cerrarModalChat()">Cerrar</button>
+    </div>
   </div>
 </div>

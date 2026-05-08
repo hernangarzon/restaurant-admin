@@ -1,3 +1,4 @@
+import { BotApiService } from '../../services/bot-api.service';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -39,6 +40,12 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   filtroTelefono: string = '';
 
+  mostrandoChat = false;
+  mensajes: any[] = [];
+  nuevoMensaje = '';
+
+  mostrarModalChat = false;
+
   nuevoPedido: Partial<Pedido> = {
     descripcion: '',
     estado: EstadoPedido.NUEVO,
@@ -51,7 +58,8 @@ export class PedidosComponent implements OnInit, OnDestroy {
     private clienteService: ClienteService,
     private restauranteService: RestauranteService,
     private cdRef: ChangeDetectorRef,
-  ) {}
+    private botService: BotApiService,
+  ) { }
 
   // =======================
   // CICLO DE VIDA
@@ -307,17 +315,17 @@ export class PedidosComponent implements OnInit, OnDestroy {
   }
 
   verDetalle(pedido: Pedido): void {
-  console.log('🔍 DEBUG - Pedido seleccionado:', pedido);
-  console.log('📅 Fecha:', pedido.fecha);
-  console.log('📊 Estado:', pedido.estado);
-  console.log('💰 Medio de pago:', pedido.medioPago); // 👈 NUEVO
-  console.log('🆔 ID:', pedido.id);
-  console.log('📍 Dirección:', pedido.direccion);
-  console.log('📄 Descripción:', pedido.descripcion);
-  this.pedidoSeleccionado = pedido;
-  this.mostrarModal = true;
-  this.cdRef.detectChanges();
-}
+    console.log('🔍 DEBUG - Pedido seleccionado:', pedido);
+    console.log('📅 Fecha:', pedido.fecha);
+    console.log('📊 Estado:', pedido.estado);
+    console.log('💰 Medio de pago:', pedido.medioPago); // 👈 NUEVO
+    console.log('🆔 ID:', pedido.id);
+    console.log('📍 Dirección:', pedido.direccion);
+    console.log('📄 Descripción:', pedido.descripcion);
+    this.pedidoSeleccionado = pedido;
+    this.mostrarModal = true;
+    this.cdRef.detectChanges();
+  }
 
   cerrarModal(): void {
     this.mostrarModal = false;
@@ -342,5 +350,92 @@ export class PedidosComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error(err),
     });
+  }
+
+  // Cambia la definición para aceptar string o number
+  cargarMensajes(clienteId: string | number) {
+    if (!clienteId) return;
+
+    this.botService.getChatHistory(clienteId).subscribe({
+      next: (data) => {
+        this.mensajes = data;
+        this.cdRef.detectChanges();
+      },
+      error: (err) => console.error('Error al cargar historial:', err)
+    });
+  }
+
+
+  guardarCambiosPedido() {
+    // Corregido: pedidoSeleccionado en lugar de pedidoSeleccion0
+    if (!this.pedidoSeleccionado || !this.pedidoSeleccionado.id) return;
+
+    this.botService.actualizarPedido(this.pedidoSeleccionado.id, this.pedidoSeleccionado).subscribe({
+      next: () => {
+        alert('✅ Pedido actualizado correctamente');
+
+        // Refrescamos la tabla con la función que encontramos en tu ngOnInit
+        this.cargarPedidos();
+
+        this.cdRef.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error al actualizar:', err);
+        alert('❌ No se pudo actualizar el pedido');
+      }
+    });
+  }
+
+
+  abrirChatYEdicion(pedido: any) {
+    this.pedidoSeleccionado = { ...pedido };
+
+    // Usamos el clienteId que viene en el DTO (numérico)
+    if (pedido.clienteId) {
+      this.cargarMensajes(pedido.clienteId);
+    } else if (pedido.cliente?.id) {
+      // Backup por si acaso el objeto trae la relación anidada
+      this.cargarMensajes(pedido.cliente.id);
+    }
+
+    this.mostrarModalChat = true;
+    this.mostrandoChat = true;
+    this.cdRef.detectChanges();
+  }
+
+  enviarRespuesta() {
+    if (!this.nuevoMensaje || !this.nuevoMensaje.trim()) return;
+
+    const pedido = this.pedidoSeleccionado as any;
+    const idDelCliente = pedido?.clienteId || pedido?.cliente?.id;
+
+    if (!idDelCliente) {
+      alert('No se pudo encontrar el ID del cliente.');
+      return;
+    }
+
+    this.botService.enviarMensajeManual(idDelCliente, this.nuevoMensaje).subscribe({
+      next: () => {
+        // USAMOS 'mensajes' QUE ES LA QUE YA TIENES DECLARADA
+        this.mensajes.push({
+          contenido: this.nuevoMensaje, // O 'texto', verifica cómo lo usa tu HTML
+          tipo: 'ADMIN',
+          fecha: new Date()
+        });
+
+        this.nuevoMensaje = '';
+        this.cdRef.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        alert('No se pudo enviar el mensaje.');
+      }
+    });
+  }
+
+  cerrarModalChat() {
+    this.mostrarModalChat = false;
+    this.mensajes = [];
+    this.cdRef.detectChanges();
   }
 }

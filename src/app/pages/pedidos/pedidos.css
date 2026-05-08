@@ -26,7 +26,8 @@
 }
 
 /* Estados de carga */
-.cargando, .actualizando {
+.cargando,
+.actualizando {
   background: linear-gradient(135deg, #3498db, #5dade2);
   color: white;
   padding: 20px;
@@ -48,8 +49,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
 }
 
 /* FILTROS - SOLO UNA VEZ */
@@ -58,7 +66,8 @@
   gap: 15px;
   margin-bottom: 25px;
   flex-wrap: wrap;
-  align-items: center; /* Esto alinea verticalmente */
+  align-items: center;
+  /* Esto alinea verticalmente */
 }
 
 /* Search wrapper para búsqueda por teléfono */
@@ -67,7 +76,8 @@
   flex: 1;
   min-width: 250px;
   max-width: 350px;
-  height: 48px; /* Misma altura que los selects */
+  height: 48px;
+  /* Misma altura que los selects */
   display: flex;
   align-items: center;
 }
@@ -127,7 +137,8 @@
 /* Selects de filtros - altura consistente */
 .filtros-container select {
   padding: 0 40px 0 20px;
-  height: 48px; /* Misma altura que el input */
+  height: 48px;
+  /* Misma altura que el input */
   border: 2px solid #dfe6e9;
   border-radius: 14px;
   background: white;
@@ -200,10 +211,21 @@
   opacity: 0.8;
 }
 
-.table th:nth-child(1)::before { content: "📅"; }
-.table th:nth-child(2)::before { content: "📱"; }
-.table th:nth-child(4)::before { content: "📊"; }
-.table th:nth-child(5)::before { content: "⚡"; }
+.table th:nth-child(1)::before {
+  content: "📅";
+}
+
+.table th:nth-child(2)::before {
+  content: "📱";
+}
+
+.table th:nth-child(4)::before {
+  content: "📊";
+}
+
+.table th:nth-child(5)::before {
+  content: "⚡";
+}
 
 .table tbody tr {
   border-bottom: 1px solid #dfe6e9;
@@ -246,37 +268,55 @@
   background: linear-gradient(135deg, #2563eb, #3b82f6);
   color: white;
 }
-.nuevo::before { content: "🆕"; }
+
+.nuevo::before {
+  content: "🆕";
+}
 
 .en_preparacion {
   background: linear-gradient(135deg, #f59e0b, #fbbf24);
   color: white;
 }
-.en_preparacion::before { content: "👨‍🍳"; }
+
+.en_preparacion::before {
+  content: "👨‍🍳";
+}
 
 .listo {
   background: linear-gradient(135deg, #16a34a, #22c55e);
   color: white;
 }
-.listo::before { content: "✅"; }
+
+.listo::before {
+  content: "✅";
+}
 
 .entregado {
   background: linear-gradient(135deg, #0f766e, #14b8a6);
   color: white;
 }
-.entregado::before { content: "📦"; }
+
+.entregado::before {
+  content: "📦";
+}
 
 .cancelado {
   background: linear-gradient(135deg, #dc2626, #ef4444);
   color: white;
 }
-.cancelado::before { content: "❌"; }
+
+.cancelado::before {
+  content: "❌";
+}
 
 .esperando_direccion {
   background: linear-gradient(135deg, #9333ea, #a855f7);
   color: white;
 }
-.esperando_direccion::before { content: "📍"; }
+
+.esperando_direccion::before {
+  content: "📍";
+}
 
 .estado-finalizado {
   background: linear-gradient(135deg, #059669, #10b981);
@@ -284,6 +324,7 @@
   padding: 12px 24px;
   font-size: 14px;
 }
+
 .estado-finalizado::before {
   content: "🏆";
   font-size: 16px;
@@ -527,7 +568,8 @@ div:has(> p:only-child):not(.no-results) p::before {
   display: inline-block;
 }
 
-.description-box, .address-box {
+.description-box,
+.address-box {
   background: #f8f9fa;
   padding: 20px;
   border-radius: 12px;
@@ -566,6 +608,7 @@ div:has(> p:only-child):not(.no-results) p::before {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -577,17 +620,32 @@ div:has(> p:only-child):not(.no-results) p::before {
   opacity: 0;
 }
 
-.table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.table tbody tr:nth-child(2) { animation-delay: 0.2s; }
-.table tbody tr:nth-child(3) { animation-delay: 0.3s; }
-.table tbody tr:nth-child(4) { animation-delay: 0.4s; }
-.table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+.table tbody tr:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.table tbody tr:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.table tbody tr:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.table tbody tr:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.table tbody tr:nth-child(5) {
+  animation-delay: 0.5s;
+}
 
 @keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -599,63 +657,63 @@ div:has(> p:only-child):not(.no-results) p::before {
   .pedidos-container {
     padding: 16px;
   }
-  
+
   .title {
     font-size: 24px;
   }
-  
+
   .filtros-container {
     flex-direction: column;
   }
-  
+
   .search-wrapper,
   .filtros-container select {
     width: 100%;
     max-width: 100%;
     height: 44px;
   }
-  
+
   .search-input,
   .filtros-container select {
     font-size: 14px;
   }
-  
+
   .table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .table th,
   .table td {
     min-width: 150px;
   }
-  
+
   .actions {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }
-  
+
   .modal-content {
     width: 95%;
     margin: 10px;
   }
-  
+
   .modal-header h2 {
     font-size: 18px;
   }
-  
+
   .detail-section h3 {
     font-size: 16px;
   }
-  
+
   .modal-footer {
     flex-direction: column;
   }
-  
+
   .modal-footer .btn {
     width: 100%;
   }
@@ -683,25 +741,25 @@ div:has(> p:only-child):not(.no-results) p::before {
 }
 
 /* Estilos específicos para cada medio de pago */
-.payment-badge[data-pago="EFECTIVO"]::before { 
+.payment-badge[data-pago="EFECTIVO"]::before {
   content: "💵";
   margin-right: 8px;
   font-size: 16px;
 }
 
-.payment-badge[data-pago="NEQUI"]::before { 
+.payment-badge[data-pago="NEQUI"]::before {
   content: "📱";
   margin-right: 8px;
   font-size: 16px;
 }
 
-.payment-badge[data-pago="TRANSFERENCIA"]::before { 
+.payment-badge[data-pago="TRANSFERENCIA"]::before {
   content: "🏦";
   margin-right: 8px;
   font-size: 16px;
 }
 
-.payment-badge[data-pago="DATAFONO"]::before { 
+.payment-badge[data-pago="DATAFONO"]::before {
   content: "💳";
   margin-right: 8px;
   font-size: 16px;
@@ -709,29 +767,283 @@ div:has(> p:only-child):not(.no-results) p::before {
 
 /* ===== ESTADO EN MODAL ===== */
 .info-item .badge {
-  all: unset !important;           /* Resetea todos los estilos */
-  background: #f8f9fa !important;   /* Fondo gris */
-  color: #2d3436 !important;        /* Texto gris oscuro */
-  padding: 0 !important;            /* Sin padding */
-  font-size: 15px !important;       /* Mismo tamaño que dirección */
-  font-weight: normal !important;   /* Sin negrita */
-  display: inline !important;       /* Misma línea */
-  border-left: none !important;     /* Sin borde izquierdo */
-  box-shadow: none !important;      /* Sin sombra */
-  border-radius: 0 !important;      /* Sin bordes redondeados */
-  text-transform: none !important;  /* Sin mayúsculas */
+  all: unset !important;
+  /* Resetea todos los estilos */
+  background: #f8f9fa !important;
+  /* Fondo gris */
+  color: #2d3436 !important;
+  /* Texto gris oscuro */
+  padding: 0 !important;
+  /* Sin padding */
+  font-size: 15px !important;
+  /* Mismo tamaño que dirección */
+  font-weight: normal !important;
+  /* Sin negrita */
+  display: inline !important;
+  /* Misma línea */
+  border-left: none !important;
+  /* Sin borde izquierdo */
+  box-shadow: none !important;
+  /* Sin sombra */
+  border-radius: 0 !important;
+  /* Sin bordes redondeados */
+  text-transform: none !important;
+  /* Sin mayúsculas */
 }
 
 /* Color del texto según estado */
-.info-item .badge.nuevo { color: #2563eb !important; }
-.info-item .badge.en_preparacion { color: #f59e0b !important; }
-.info-item .badge.listo { color: #16a34a !important; }
-.info-item .badge.entregado { color: #0f766e !important; }
-.info-item .badge.cancelado { color: #dc2626 !important; }
+.info-item .badge.nuevo {
+  color: #2563eb !important;
+}
+
+.info-item .badge.en_preparacion {
+  color: #f59e0b !important;
+}
+
+.info-item .badge.listo {
+  color: #16a34a !important;
+}
+
+.info-item .badge.entregado {
+  color: #0f766e !important;
+}
+
+.info-item .badge.cancelado {
+  color: #dc2626 !important;
+}
 
 /* Iconos */
-.info-item .badge.nuevo::before { content: "🆕" !important; margin-right: 4px; }
-.info-item .badge.en_preparacion::before { content: "👨‍🍳" !important; margin-right: 4px; }
-.info-item .badge.listo::before { content: "✅" !important; margin-right: 4px; }
-.info-item .badge.entregado::before { content: "📦" !important; margin-right: 4px; }
-.info-item .badge.cancelado::before { content: "❌" !important; margin-right: 4px; }
+.info-item .badge.nuevo::before {
+  content: "🆕" !important;
+  margin-right: 4px;
+}
+
+.info-item .badge.en_preparacion::before {
+  content: "👨‍🍳" !important;
+  margin-right: 4px;
+}
+
+.info-item .badge.listo::before {
+  content: "✅" !important;
+  margin-right: 4px;
+}
+
+.info-item .badge.entregado::before {
+  content: "📦" !important;
+  margin-right: 4px;
+}
+
+.info-item .badge.cancelado::before {
+  content: "❌" !important;
+  margin-right: 4px;
+}
+
+.modal-grande {
+  width: 90%;
+  max-width: 1000px;
+  /* Más ancho para las dos columnas */
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Divide el modal en dos */
+  gap: 20px;
+  height: 500px;
+}
+
+.messages-container {
+  height: 350px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Burbujas tipo WhatsApp */
+.msg-left .bubble {
+  background: #fff;
+  align-self: flex-start;
+}
+
+.msg-right .bubble {
+  background: #dcf8c6;
+  align-self: flex-end;
+  text-align: right;
+}
+
+/* Asegúrate de que el overlay del chat sea superior a todo */
+.modal-overlay {
+  z-index: 1000;
+  /* Un número alto */
+}
+
+.modal-grande {
+  z-index: 1001;
+}
+
+/* Contenedor principal del nuevo modal */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  min-height: 500px;
+  padding: 10px;
+}
+
+/* Columnas individuales */
+.chat-column,
+.edit-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chat-column {
+  border-right: 1px solid #eee;
+  padding-right: 20px;
+}
+
+.messages-container {
+  flex-grow: 1;
+  height: 380px;
+  overflow-y: auto;
+  background: #e5ddd5;
+  /* Color clásico de fondo de WhatsApp */
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.msg-left .bubble {
+  background: white;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.msg-right .bubble {
+  background: #dcf8c6;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+/* Input de chat */
+.chat-footer {
+  display: flex;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.chat-footer input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
+
+.edit-column h3 {
+  color: #2d3436;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.edit-column label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #636e72;
+  margin-bottom: 5px;
+}
+
+.edit-column textarea,
+.edit-column input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #dfe6e9;
+  border-radius: 10px;
+  font-family: inherit;
+  margin-bottom: 15px;
+  transition: border-color 0.3s;
+}
+
+.edit-column textarea:focus {
+  border-color: #ff6b6b;
+  outline: none;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: auto;
+}
+
+.modal-overlay {
+  z-index: 1100 !important;
+  /* Superior al modal de detalle */
+}
+
+.modal-grande {
+  max-width: 950px !important;
+  width: 95%;
+}
+
+/* Botón de apertura en el modal de detalle */
+.ver-conversacion-btn {
+  background: linear-gradient(135deg, #128C7E 0%, #25D366 100%) !important;
+  /* Verde WhatsApp */
+  color: white !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+}
+
+.ver-conversacion-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);
+}
+
+/* Botón de Guardar Cambios en el nuevo modal */
+.btn-guardar-edicion {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%) !important;
+  /* Morado elegante */
+  color: white !important;
+  font-weight: 700;
+  margin-top: 15px;
+}
+
+.btn-guardar-edicion:hover {
+  background: linear-gradient(135deg, #5b4cc4 0%, #8e85f1 100%) !important;
+}
+
+/* Botón Cerrar del nuevo modal */
+.btn-cerrar-chat {
+  background-color: #f1f3f4 !important;
+  color: #5f6368 !important;
+  border: 1px solid #dadce0;
+}
+
+/* Botón Cerrar del modal de Chat/Edición */
+.btn-cerrar-chat {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+  /* Rojo vibrante */
+  color: white !important;
+  border: none !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+.btn-cerrar-chat:hover {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+}

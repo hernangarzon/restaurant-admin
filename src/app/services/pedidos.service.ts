@@ -23,6 +23,10 @@ export class PedidoService {
     });
   }
 
+  actualizarPedido(id: number, data: Partial<Pedido>): Observable<Pedido> {
+    return this.http.put<Pedido>(`${this.API_URL}/admin/pedidos/${id}`, data).pipe(catchError(this.handleError));
+  }
+
   crearPedido(pedido: Pedido): Observable<Pedido> {
     return this.http.post<Pedido>(this.API_URL, pedido).pipe(catchError(this.handleError));
   }

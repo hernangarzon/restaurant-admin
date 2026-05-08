@@ -12,7 +12,7 @@ export interface Estadisticas {
   pedidosListos: number;
   pedidosEntregados: number;
   totalClientes: number;
-  ingresosEstimados?: number; // Añade esta línea como opcional
+  ingresosEstimados?: number;
 }
 
 @Injectable({
@@ -21,7 +21,7 @@ export interface Estadisticas {
 export class BotApiService {
   private baseUrl = API_URL;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // === DASHBOARD ===
   getEstadisticas(): Observable<Estadisticas> {
@@ -47,4 +47,33 @@ export class BotApiService {
       estado
     });
   }
+
+  // ✅ NUEVO: Obtener historial de mensajes de Supabase/PostgreSQL
+  getChatHistory(clienteId: string | number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/api/bot/historial/${clienteId}`);
+  }
+
+  // ✅ NUEVO: Enviar respuesta a través de la WhatsApp Cloud API
+  enviarMensajeWhatsapp(payload: { texto: string, telefono: string }): Observable<any> {
+    // Cambiado de this.apiUrl a this.baseUrl para que coincida con tu declaración arriba
+    return this.http.post(`${this.baseUrl}/api/bot/enviar`, payload);
+  }
+
+  actualizarPedido(pedidoId: number, datos: Partial<Pedido>): Observable<any> {
+    // Usamos PATCH para actualizaciones parciales (solo descripción/dirección)
+    // o POST según como tengas configurado tu backend en Spring Boot
+    return this.http.put(`${this.baseUrl}/admin/pedidos/${pedidoId}`, datos);
+  }
+
+  getHistorialChat(clienteId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/admin/pedidos/mensajes/${clienteId}`);
+  }
+
+  enviarMensajeManual(clienteId: number, contenido: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/admin/pedidos/enviar-mensaje`, {
+      clienteId: clienteId.toString(),
+      contenido: contenido
+    });
+  }
+
 }
