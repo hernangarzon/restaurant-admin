@@ -1047,3 +1047,23 @@ div:has(> p:only-child):not(.no-results) p::before {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
 }
+
+.msg-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.msg-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.msg-left .bubble {
+  background: white;
+}
+
+.msg-right .bubble {
+  background: #dcf8c6;
+}

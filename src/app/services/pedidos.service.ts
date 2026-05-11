@@ -9,7 +9,7 @@ import { API_URL } from './api.config';
 export class PedidoService {
   private readonly API_URL = API_URL;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getPedidosByRestaurante(restauranteId: number) {
     return this.http.get<Pedido[]>(`${this.API_URL}/admin/pedidos`, {
@@ -43,4 +43,14 @@ export class PedidoService {
   cancelarPedido(id: number) {
     return this.http.put(`${this.API_URL}/admin/pedidos/${id}/cancelar`, null);
   }
+
+  // Agrégalo al final de tu clase PedidoService, antes de la llave de cierre
+  getHistorialMensajes(clienteId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API_URL}/admin/pedidos/mensajes/${clienteId}`);
+  }
+
+  enviarMensajeManual(clienteId: number, contenido: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/admin/pedidos/enviar-mensaje`, { clienteId, contenido });
+  }
+
 }

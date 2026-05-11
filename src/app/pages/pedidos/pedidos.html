@@ -230,8 +230,11 @@
       <div class="chat-column">
         <h3>Conversación</h3>
         <div class="messages-container" #scrollChat>
-          <div *ngFor="let msg of mensajes" [ngClass]="msg.es_cliente ? 'msg-left' : 'msg-right'">
-            <div class="bubble">{{ msg.texto }}</div>
+          <div *ngFor="let msg of mensajes"
+            [ngClass]="{'msg-left': msg.tipo === 'CLIENTE', 'msg-right': msg.tipo !== 'CLIENTE'}"
+            style="display: flex; flex-direction: column;">
+            <div class="bubble">{{ msg.contenido }}</div>
+
             <small>{{ msg.fecha | date:'shortTime' }}</small>
           </div>
         </div>

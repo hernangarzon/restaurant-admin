@@ -49,14 +49,16 @@ export class BotApiService {
   }
 
   // ✅ NUEVO: Obtener historial de mensajes de Supabase/PostgreSQL
-  getChatHistory(clienteId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/bot/historial/${clienteId}`);
+  getChatHistory(pedidoId: string | number): Observable<any[]> {
+    // Ahora la variable dentro del ${} coincide con el parámetro de arriba
+    // return this.http.get<any[]>(`${this.baseUrl}/admin/pedidos/mensajes/pedido/${pedidoId}`);
+    return this.http.get<any[]>(`${this.baseUrl}/admin/pedidos/mensajes/${pedidoId}`);
   }
 
+
   // ✅ NUEVO: Enviar respuesta a través de la WhatsApp Cloud API
-  enviarMensajeWhatsapp(payload: { texto: string, telefono: string }): Observable<any> {
-    // Cambiado de this.apiUrl a this.baseUrl para que coincida con tu declaración arriba
-    return this.http.post(`${this.baseUrl}/api/bot/enviar`, payload);
+  enviarMensajeWhatsapp(payload: { clienteId: number, contenido: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/admin/pedidos/enviar-mensaje`, payload);
   }
 
   actualizarPedido(pedidoId: number, datos: Partial<Pedido>): Observable<any> {
@@ -69,10 +71,11 @@ export class BotApiService {
     return this.http.get<any[]>(`${this.baseUrl}/admin/pedidos/mensajes/${clienteId}`);
   }
 
-  enviarMensajeManual(clienteId: number, contenido: string): Observable<any> {
+  enviarMensajeManual(clienteId: number, contenido: string, pedidoId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/admin/pedidos/enviar-mensaje`, {
       clienteId: clienteId.toString(),
-      contenido: contenido
+      contenido: contenido,
+      pedidoId: pedidoId.toString() // <--- Importante para el Backend
     });
   }
 

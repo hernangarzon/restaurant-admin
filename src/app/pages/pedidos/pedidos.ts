@@ -353,15 +353,10 @@ export class PedidosComponent implements OnInit, OnDestroy {
   }
 
   // Cambia la definición para aceptar string o number
-  cargarMensajes(clienteId: string | number) {
-    if (!clienteId) return;
-
-    this.botService.getChatHistory(clienteId).subscribe({
-      next: (data) => {
-        this.mensajes = data;
-        this.cdRef.detectChanges();
-      },
-      error: (err) => console.error('Error al cargar historial:', err)
+  cargarMensajes(pedidoId: number) {
+    this.botService.getChatHistory(pedidoId).subscribe(res => {
+      console.log('Mensajes recibidos:', res);
+      this.mensajes = res;
     });
   }
 
@@ -389,22 +384,21 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   abrirChatYEdicion(pedido: any) {
     this.pedidoSeleccionado = { ...pedido };
+    this.mensajes = [];
 
-    // Usamos el clienteId que viene en el DTO (numérico)
-    if (pedido.clienteId) {
-      this.cargarMensajes(pedido.clienteId);
-    } else if (pedido.cliente?.id) {
-      // Backup por si acaso el objeto trae la relación anidada
-      this.cargarMensajes(pedido.cliente.id);
+    if (pedido.id) {
+      this.botService.getChatHistory(pedido.id).subscribe(res => {
+        this.mensajes = res;
+        this.mostrarModalChat = true;
+        this.mostrandoChat = true;
+        this.cdRef.detectChanges();
+      });
     }
-
-    this.mostrarModalChat = true;
-    this.mostrandoChat = true;
-    this.cdRef.detectChanges();
   }
 
   enviarRespuesta() {
     if (!this.nuevoMensaje || !this.nuevoMensaje.trim()) return;
+    if (!this.pedidoSeleccionado) return;
 
     const pedido = this.pedidoSeleccionado as any;
     const idDelCliente = pedido?.clienteId || pedido?.cliente?.id;
@@ -414,7 +408,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.botService.enviarMensajeManual(idDelCliente, this.nuevoMensaje).subscribe({
+    this.botService.enviarMensajeManual(idDelCliente, this.nuevoMensaje, this.pedidoSeleccionado.id).subscribe({
       next: () => {
         // USAMOS 'mensajes' QUE ES LA QUE YA TIENES DECLARADA
         this.mensajes.push({
