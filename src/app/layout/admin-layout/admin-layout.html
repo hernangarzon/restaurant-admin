@@ -2,7 +2,7 @@
 
   <!-- Sidebar Moderno -->
   <aside class="sidebar">
-    
+
     <!-- Header del Sidebar -->
     <div class="sidebar-header">
       <div class="logo-container">
@@ -13,7 +13,7 @@
           <h2 class="logo">Restaurant Admin</h2>
         </div>
       </div>
-      
+
       <!-- Información del usuario -->
       <div class="user-info" *ngIf="username">
         <div class="user-avatar">
@@ -28,30 +28,23 @@
 
     <!-- Navegación -->
     <nav class="sidebar-nav">
-      <a routerLink="/admin/dashboard" 
-         routerLinkActive="active" 
-         class="nav-item">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">
         <span class="nav-icon">📊</span>
         <span class="nav-text">Dashboard</span>
       </a>
 
-      <a routerLink="/admin/pedidos" 
-         routerLinkActive="active" 
-         class="nav-item">
+      <a routerLink="/admin/pedidos" routerLinkActive="active" class="nav-item">
         <span class="nav-icon">🧾</span>
         <span class="nav-text">Pedidos</span>
+        <span class="badge-notif" *ngIf="mensajesNoLeidos > 0">{{ mensajesNoLeidos }}</span>
       </a>
-      
-      <a routerLink="/admin/menu-dia" 
-         routerLinkActive="active" 
-         class="nav-item">
+
+      <a routerLink="/admin/menu-dia" routerLinkActive="active" class="nav-item">
         <span class="nav-icon">📅</span>
         <span class="nav-text">Menú del día</span>
       </a>
 
-      <a routerLink="/admin/change-password" 
-         routerLinkActive="active" 
-         class="nav-item">
+      <a routerLink="/admin/change-password" routerLinkActive="active" class="nav-item">
         <span class="nav-icon">🔑</span>
         <span class="nav-text">Cambiar contraseña</span>
       </a>
@@ -64,12 +57,16 @@
         <span>Cerrar Sesión</span>
       </button>
     </div>
-    
+
   </aside>
 
   <!-- Main content -->
   <main class="content">
     <router-outlet></router-outlet>
   </main>
+
+  <div class="toast-notif" *ngIf="mostrarToast">
+    {{ toastMensaje }}
+  </div>
 
 </div>

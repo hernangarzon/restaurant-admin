@@ -53,4 +53,8 @@ export class PedidoService {
     return this.http.post(`${this.API_URL}/admin/pedidos/enviar-mensaje`, { clienteId, contenido });
   }
 
+  getMensajesNoLeidos(restauranteId: number): Observable<{ total: number }> {
+    return this.http.get<{ total: number }>(`${this.API_URL}/admin/pedidos/mensajes/no-leidos?restauranteId=${restauranteId}`);
+  }
+
 }
