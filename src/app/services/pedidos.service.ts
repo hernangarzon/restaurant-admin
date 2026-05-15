@@ -57,4 +57,8 @@ export class PedidoService {
     return this.http.get<{ total: number }>(`${this.API_URL}/admin/pedidos/mensajes/no-leidos?restauranteId=${restauranteId}`);
   }
 
+  marcarMensajesLeidos(pedidoId: number): Observable<any> {
+    return this.http.put(`${this.API_URL}/admin/pedidos/mensajes/${pedidoId}/marcar-leidos`, null);
+  }
+
 }

@@ -352,14 +352,14 @@ export class PedidosComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Cambia la definición para aceptar string o number
   cargarMensajes(pedidoId: number) {
     this.botService.getChatHistory(pedidoId).subscribe(res => {
       console.log('Mensajes recibidos:', res);
       this.mensajes = res;
+      // Marcar como leídos al abrir el chat
+      this.pedidoService.marcarMensajesLeidos(pedidoId).subscribe();
     });
   }
-
 
   guardarCambiosPedido() {
     // Corregido: pedidoSeleccionado en lugar de pedidoSeleccion0
@@ -432,4 +432,5 @@ export class PedidosComponent implements OnInit, OnDestroy {
     this.mensajes = [];
     this.cdRef.detectChanges();
   }
+
 }

@@ -45,10 +45,13 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   }
 
   private consultarMensajes() {
+    console.log('🔔 Consultando mensajes no leídos...');
     const restauranteId = this.authService.getRestauranteId();
+    console.log('🏪 RestauranteId:', restauranteId);
     if (!restauranteId) return;
 
     this.pedidoService.getMensajesNoLeidos(restauranteId).subscribe((res: { total: number }) => {
+      console.log('📬 Respuesta no leídos:', res);
       if (res.total > this.anteriorConteo && this.anteriorConteo > 0) {
         this.mostrarNotificacion(`📩 Tienes ${res.total} pedido(s) con mensajes nuevos`);
       }
