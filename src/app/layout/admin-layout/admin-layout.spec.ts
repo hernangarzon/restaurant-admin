@@ -1,22 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { AdminLayoutComponent } from './admin-layout';
 
 describe('AdminLayoutComponent', () => {
-  let component: AdminLayoutComponent;
-  let fixture: ComponentFixture<AdminLayoutComponent>;
-
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
-      imports: [AdminLayoutComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(AdminLayoutComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+      imports: [AdminLayoutComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    }).compileComponents();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('se crea', () => {
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
+    fixture.detectChanges();
+    expect(fixture.componentInstance).toBeTruthy();
+    fixture.destroy();
   });
 });

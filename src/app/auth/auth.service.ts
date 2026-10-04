@@ -1,7 +1,6 @@
 // src/app/auth/auth.service.ts
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
 import { API_URL } from '../services/api.config';
 
@@ -15,21 +14,19 @@ export interface LoginResponse {
   restauranteId: number;
   restauranteNombre: string;
   token: string;
-  // Propiedades opcionales para compatibilidad
-  success?: boolean;
-  message?: string;
 }
 
-export interface ChangePasswordRequest {
-  adminId: number;
-  passwordActual: string;
-  nuevaPassword: string;
-}
+// Claves de la sesión en localStorage. AuthService es el único que las lee o escribe.
+const CLAVES = {
+  token: 'token',
+  username: 'username',
+  adminId: 'admin_id',
+  restauranteId: 'restaurante_id',
+  restauranteNombre: 'restaurante_nombre',
+} as const;
 
-export interface ChangePasswordResponse {
-  success: boolean;
-  message?: string;
-}
+// Claves de versiones anteriores; se borran al cerrar sesión
+const CLAVES_ANTIGUAS = ['loggedIn', 'restaurante_activo'];
 
 @Injectable({
   providedIn: 'root',
@@ -37,10 +34,7 @@ export interface ChangePasswordResponse {
 export class AuthService {
   private baseUrl = API_URL;
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   // ================= LOGIN =================
   login(telefonoWhatsapp: string, password: string): Observable<LoginResponse> {
@@ -48,71 +42,40 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/admin/auth/login`, body);
   }
 
+  iniciarSesion(res: LoginResponse, username: string): void {
+    this.logout(); // nunca mezclar datos de una sesión anterior
+    localStorage.setItem(CLAVES.token, res.token);
+    localStorage.setItem(CLAVES.username, username);
+    localStorage.setItem(CLAVES.adminId, String(res.adminId));
+    localStorage.setItem(CLAVES.restauranteId, String(res.restauranteId));
+    localStorage.setItem(CLAVES.restauranteNombre, res.restauranteNombre ?? '');
+  }
+
   // ================= LOGOUT =================
   logout(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('restaurante_id');
-
-    console.log('🔒 Sesión cerrada');
+    [...Object.values(CLAVES), ...CLAVES_ANTIGUAS].forEach((k) => localStorage.removeItem(k));
   }
 
-  // ================= CHECK LOGIN =================
+  // ================= SESIÓN =================
   isLoggedIn(): boolean {
-    if (!isPlatformBrowser(this.platformId)) return false;
-    const token = localStorage.getItem('token');
-    return !!token;
-  }
-
-  getUsername(): string | null {
-    if (!isPlatformBrowser(this.platformId)) return null;
-    return localStorage.getItem('username');
+    return !!this.getToken() && !this.isTokenExpired();
   }
 
   getToken(): string | null {
-    if (!isPlatformBrowser(this.platformId)) return null;
-    return localStorage.getItem('token');
+    return localStorage.getItem(CLAVES.token);
+  }
+
+  getUsername(): string | null {
+    return localStorage.getItem(CLAVES.username);
   }
 
   getRestauranteId(): number | null {
-    if (!isPlatformBrowser(this.platformId)) return null;
-    const id = localStorage.getItem('restaurante_id');
-    return id ? Number(id) : null;
+    const id = Number(localStorage.getItem(CLAVES.restauranteId));
+    return id > 0 ? id : null;
   }
 
-  saveSessionData(
-    username: string,
-    token?: string,
-    restauranteId?: number,
-    adminId?: number,
-    restauranteNombre?: string,
-  ): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('loggedIn', 'true');
-      localStorage.setItem('username', username);
-
-      if (token) localStorage.setItem('token', token);
-      if (restauranteId) localStorage.setItem('restaurante_id', restauranteId.toString());
-
-      // Nuevos parámetros opcionales
-      if (adminId) localStorage.setItem('admin_id', adminId.toString());
-      if (restauranteNombre) localStorage.setItem('restaurante_nombre', restauranteNombre);
-    }
-  }
-
-  // ================= CAMBIO DE CONTRASEÑA =================
-  changePassword(
-    adminId: number,
-    passwordActual: string,
-    nuevaPassword: string,
-  ): Observable<ChangePasswordResponse> {
-    const body: ChangePasswordRequest = { adminId, passwordActual, nuevaPassword };
-    return this.http.post<ChangePasswordResponse>(
-      `${this.baseUrl}/admin/auth/cambiar-password`,
-      body,
-    );
+  getRestauranteNombre(): string | null {
+    return localStorage.getItem(CLAVES.restauranteNombre) || null;
   }
 
   isTokenExpired(): boolean {
@@ -120,11 +83,22 @@ export class AuthService {
     if (!token) return true;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const expMs = payload.exp * 1000;
-      return Date.now() > expMs;
+      // El payload del JWT es base64url (usa - y _ y no trae relleno); atob solo acepta base64
+      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')));
+      return typeof payload.exp !== 'number' || Date.now() >= payload.exp * 1000;
     } catch {
       return true;
     }
+  }
+
+  // ================= CAMBIO DE CONTRASEÑA =================
+  // El backend identifica al admin por el token; responde texto plano
+  changePassword(passwordActual: string, nuevaPassword: string): Observable<string> {
+    return this.http.post(
+      `${this.baseUrl}/admin/auth/cambiar-password`,
+      { passwordActual, nuevaPassword },
+      { responseType: 'text' },
+    );
   }
 }

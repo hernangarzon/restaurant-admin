@@ -1,28 +1,28 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { LoginComponent } from './login';
 
-@Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.html'
-})
-export class LoginComponent {
-  isBrowser = false;
-  loginForm!: FormGroup;
+describe('LoginComponent', () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [LoginComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    }).compileComponents();
+  });
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
-  }
+  it('se crea', () => {
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+    expect(fixture.componentInstance).toBeTruthy();
+    fixture.destroy();
+  });
 
-  ngOnInit() {
-    if (this.isBrowser) {
-      this.loginForm = new FormGroup({
-        username: new FormControl('', Validators.required),
-        password: new FormControl('', Validators.required)
-      });
-    }
-  }
-}
+  it('pide completar los campos antes de llamar al backend', () => {
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.componentInstance.onLogin();
+    expect(fixture.componentInstance.error).toBe('Por favor, completa todos los campos');
+  });
+});

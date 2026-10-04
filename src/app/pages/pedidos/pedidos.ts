@@ -5,12 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
 
 import { Pedido } from '../../models/pedido.model';
-import { ClienteAdmin } from '../../models/cliente-admin.model';
 import { Restaurante } from '../../models/restaurante.model';
 import { EstadoPedido } from '../../models/estado-pedido';
 
 import { PedidoService } from '../../services/pedidos.service';
-import { ClienteService } from '../../services/clientes.service';
 import { RestauranteService } from '../../services/restaurante.service';
 
 @Component({
@@ -24,9 +22,6 @@ export class PedidosComponent implements OnInit, OnDestroy {
   pedidos: Pedido[] = [];
   pedidosOriginales: Pedido[] = [];
 
-  clientes: ClienteAdmin[] = [];
-
-  mostrarFormulario = false;
   autoRefreshSub!: Subscription;
   actualizando = false;
   cargandoInicial = true;
@@ -46,16 +41,10 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
   mostrarModalChat = false;
 
-  nuevoPedido: Partial<Pedido> = {
-    descripcion: '',
-    estado: EstadoPedido.NUEVO,
-  };
-
   private restaurante!: Restaurante;
 
   constructor(
     private pedidoService: PedidoService,
-    private clienteService: ClienteService,
     private restauranteService: RestauranteService,
     private cdRef: ChangeDetectorRef,
     private botService: BotApiService,
@@ -77,7 +66,6 @@ export class PedidosComponent implements OnInit, OnDestroy {
     if (restaurante) {
       this.restaurante = restaurante;
       this.cargarPedidos();
-      this.cargarClientes();
     }
   }
 
@@ -96,17 +84,6 @@ export class PedidosComponent implements OnInit, OnDestroy {
 
     this.pedidoService.getPedidosByRestaurante(this.restaurante.id).subscribe({
       next: (data: Pedido[]) => {
-        console.log('📦 DEBUG - Pedidos recibidos del backend:', data);
-
-        // Verifica el primer pedido
-        if (data.length > 0) {
-          const primerPedido = data[0];
-          console.log('🔍 Primer pedido completo:', primerPedido);
-          console.log('📱 Teléfono en cliente:', primerPedido.cliente?.telefono);
-          console.log('📱 telefonoCliente:', primerPedido.telefonoCliente);
-          console.log('📄 Descripción:', primerPedido.descripcion);
-        }
-
         let pedidosProcesados = [...data];
 
         // 🔹 Guardamos originales para filtros
@@ -272,56 +249,7 @@ export class PedidosComponent implements OnInit, OnDestroy {
     });
   }
 
-  // =======================
-  // CLIENTES
-  // =======================
-
-  cargarClientes(): void {
-    if (!this.restaurante?.id) return;
-    this.clientes = this.clienteService.getClientes(this.restaurante.id);
-  }
-
-  getTelefonoCliente(cliente?: ClienteAdmin): string {
-    return cliente?.telefono ?? '—';
-  }
-
-  // =======================
-  // CREAR PEDIDO
-  // =======================
-
-  crearPedido(): void {
-    if (!this.restaurante) return;
-
-    const pedido: Pedido = {
-      ...this.nuevoPedido,
-      restauranteId: this.restaurante.id,
-    } as Pedido;
-
-    this.pedidoService.crearPedido(pedido).subscribe({
-      next: () => {
-        this.cargarPedidos();
-        this.cancelar();
-      },
-      error: (err) => console.error(err),
-    });
-  }
-
-  cancelar(): void {
-    this.mostrarFormulario = false;
-    this.nuevoPedido = {
-      descripcion: '',
-      estado: EstadoPedido.NUEVO,
-    };
-  }
-
   verDetalle(pedido: Pedido): void {
-    console.log('🔍 DEBUG - Pedido seleccionado:', pedido);
-    console.log('📅 Fecha:', pedido.fecha);
-    console.log('📊 Estado:', pedido.estado);
-    console.log('💰 Medio de pago:', pedido.medioPago); // 👈 NUEVO
-    console.log('🆔 ID:', pedido.id);
-    console.log('📍 Dirección:', pedido.direccion);
-    console.log('📄 Descripción:', pedido.descripcion);
     this.pedidoSeleccionado = pedido;
     this.mostrarModal = true;
     this.cdRef.detectChanges();
@@ -349,15 +277,6 @@ export class PedidosComponent implements OnInit, OnDestroy {
         this.cdRef.detectChanges();
       },
       error: (err) => console.error(err),
-    });
-  }
-
-  cargarMensajes(pedidoId: number) {
-    this.botService.getChatHistory(pedidoId).subscribe(res => {
-      console.log('Mensajes recibidos:', res);
-      this.mensajes = res;
-      // Marcar como leídos al abrir el chat
-      this.pedidoService.marcarMensajesLeidos(pedidoId).subscribe();
     });
   }
 

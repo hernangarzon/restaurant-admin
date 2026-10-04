@@ -2,9 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../auth/auth.service';
-import { RestauranteService } from '../services/restaurante.service';
-import { Restaurante } from '../models/restaurante.model';
+import { AuthService, LoginResponse } from '../auth/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 
@@ -23,7 +21,6 @@ export class LoginComponent {
 
   constructor(
     private auth: AuthService,
-    private restauranteService: RestauranteService,
     private router: Router,
     private cdr: ChangeDetectorRef // AÑADIR ESTO
   ) {}
@@ -41,31 +38,13 @@ export class LoginComponent {
     this.loading = true;
     this.cdr.detectChanges(); // Forzar actualización del loading
 
-    console.log('🔐 Intentando login con:', this.username);
-
     this.auth.login(this.username.trim(), this.password.trim()).subscribe({
-      next: (res: any) => {
-        console.log('✅ Respuesta exitosa:', res);
+      next: (res: LoginResponse) => {
         this.loading = false;
         this.cdr.detectChanges(); // Forzar actualización
         
         if (res && res.token) {
-          this.auth.saveSessionData(this.username, res.token, res.restauranteId);
-          
-          if (typeof window !== 'undefined') {
-            if (res.adminId) localStorage.setItem('admin_id', res.adminId.toString());
-            if (res.restauranteNombre) localStorage.setItem('restaurante_nombre', res.restauranteNombre);
-          }
-
-          const restaurante: Restaurante = {
-            id: res.restauranteId,
-            nombre: res.restauranteNombre || 'Restaurante',
-            direccion: '',
-            telefono: '',
-            activo: true,
-          };
-          this.restauranteService.setRestaurante(restaurante);
-
+          this.auth.iniciarSesion(res, this.username.trim());
           this.router.navigate(['/admin/dashboard']);
         } 
         else {
@@ -74,8 +53,6 @@ export class LoginComponent {
         }
       },
       error: (err: HttpErrorResponse) => {
-        console.log('❌ Error HTTP:', err.status, err.error);
-        
         this.loading = false; // Esto debería funcionar
         
         if (err.status === 401) {
@@ -90,7 +67,6 @@ export class LoginComponent {
         
         // FORZAR ACTUALIZACIÓN DE LA UI
         this.cdr.detectChanges();
-        console.log('🔄 UI actualizada, loading:', this.loading, 'error:', this.error);
       }
     });
   }

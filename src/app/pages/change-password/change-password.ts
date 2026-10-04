@@ -2,8 +2,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { API_URL } from '../../services/api.config';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({
@@ -21,7 +19,6 @@ export class ChangePasswordComponent {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private authService: AuthService,
   ) {
     this.form = this.fb.group({
@@ -46,12 +43,9 @@ export class ChangePasswordComponent {
 
     this.loading = true;
 
-    const adminId = Number(localStorage.getItem('admin_id'));
-    const body = { adminId, passwordActual, nuevaPassword };
-
-    // Petición POST, forzando responseType JSON
-    this.http
-      .post(`${API_URL}/admin/auth/cambiar-password`, body, { responseType: 'text' })
+    // El backend identifica al admin por el token de la sesión
+    this.authService
+      .changePassword(passwordActual, nuevaPassword)
       .subscribe({
         next: (res: string) => {
           this.loading = false;
