@@ -1,0 +1,11 @@
+// Cloudflare Workers: solo archivos estáticos (SPA), sin servidor.
+// Tener este archivo evita que `wrangler deploy` intente autoconfigurar Angular con SSR.
+{
+  "name": "restaurant-admin",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/restaurant-admin/browser",
+    // Rutas como /admin/pedidos devuelven index.html (equivalente a vercel.json)
+    "not_found_handling": "single-page-application"
+  }
+}
