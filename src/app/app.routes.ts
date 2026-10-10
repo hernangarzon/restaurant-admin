@@ -8,6 +8,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { MenuDiaComponent } from './pages/menu-dia/menu-dia';
 import { ChangePasswordComponent } from './pages/change-password/change-password';
 import { LoginGuard } from './auth/login.guard';
+import { superadminGuard } from './auth/superadmin.guard';
 
 export const routes: Routes = [
   // 🔐 Login
@@ -18,12 +19,22 @@ export const routes: Routes = [
     path: 'admin',
     component: AdminLayoutComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'pedidos', component: PedidosComponent },
       { path: 'clientes', component: ClientesComponent },
       { path: 'menu-dia', component: MenuDiaComponent },
       { path: 'change-password', component: ChangePasswordComponent},
+      {
+        path: 'configuracion',
+        loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.ConfiguracionComponent),
+      },
+      {
+        path: 'superadmin',
+        canActivate: [superadminGuard],
+        loadComponent: () => import('./pages/superadmin/superadmin').then((m) => m.SuperadminComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

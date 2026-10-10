@@ -36,6 +36,11 @@
       <a routerLink="/admin/pedidos" routerLinkActive="active" class="nav-item">
         <span class="nav-icon">🧾</span>
         <span class="nav-text">Pedidos</span>
+        @if (notificaciones.nuevos() > 0) {
+          <span class="badge-nuevos" [attr.aria-label]="notificaciones.nuevos() + ' pedidos nuevos'">
+            {{ notificaciones.nuevos() }} nuevo(s)
+          </span>
+        }
         <span class="badge-notif" *ngIf="mensajesNoLeidos > 0">{{ mensajesNoLeidos }}</span>
       </a>
 
@@ -43,6 +48,18 @@
         <span class="nav-icon">📅</span>
         <span class="nav-text">Menú del día</span>
       </a>
+
+      <a routerLink="/admin/configuracion" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🏪</span>
+        <span class="nav-text">Mi restaurante</span>
+      </a>
+
+      @if (esSuperadmin) {
+        <a routerLink="/admin/superadmin" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🛡️</span>
+          <span class="nav-text">Restaurantes</span>
+        </a>
+      }
 
       <a routerLink="/admin/change-password" routerLinkActive="active" class="nav-item">
         <span class="nav-icon">🔑</span>
@@ -52,6 +69,22 @@
 
     <!-- Botón de Cerrar Sesión -->
     <div class="sidebar-footer">
+      <!-- Sonido de pedidos nuevos: los navegadores exigen un clic para permitir audio -->
+      @if (notificaciones.sonidoActivo()) {
+        <button type="button" class="btn-sonido" (click)="notificaciones.desactivarSonido()"
+          aria-label="Desactivar sonido de pedidos nuevos">
+          🔔 Sonido activado
+        </button>
+      } @else if (notificaciones.sonidoBloqueado()) {
+        <button type="button" class="btn-sonido btn-sonido-aviso" (click)="notificaciones.activarSonido()">
+          🔇 Toca para activar el sonido
+        </button>
+      } @else {
+        <button type="button" class="btn-sonido" (click)="notificaciones.activarSonido()">
+          🔕 Activar sonido de pedidos
+        </button>
+      }
+
       <button (click)="logout()" class="btn-logout">
         <span class="btn-logout-icon">🚪</span>
         <span>Cerrar Sesión</span>
@@ -65,7 +98,7 @@
     <router-outlet></router-outlet>
   </main>
 
-  <div class="toast-notif" *ngIf="mostrarToast">
+  <div class="toast-notif" *ngIf="mostrarToast" role="status" aria-live="polite">
     {{ toastMensaje }}
   </div>
 

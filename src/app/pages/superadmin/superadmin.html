@@ -1,0 +1,175 @@
+<div class="sa">
+  <header class="sa-header">
+    <div>
+      <h1>Restaurantes</h1>
+      <p>Administración de la plataforma</p>
+    </div>
+    <button type="button" class="btn-principal" (click)="mostrarFormulario.set(!mostrarFormulario())"
+      [attr.aria-expanded]="mostrarFormulario()" aria-controls="form-restaurante">
+      {{ mostrarFormulario() ? 'Cancelar' : '+ Nuevo restaurante' }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="msg msg-error" role="alert">
+      {{ error() }}
+      <button type="button" class="btn-link" (click)="error.set('')">Cerrar</button>
+    </div>
+  }
+
+  @if (credenciales(); as cred) {
+    <div class="credenciales" role="status">
+      <h2>{{ cred.contexto }}</h2>
+      <p>Entrégale estos datos al administrador. <strong>La contraseña no se volverá a mostrar</strong>;
+        deberá cambiarla al entrar.</p>
+      <dl>
+        <dt>Usuario (teléfono)</dt>
+        <dd>{{ cred.telefono }}</dd>
+        <dt>Contraseña temporal</dt>
+        <dd><code>{{ cred.passwordTemporal }}</code></dd>
+      </dl>
+      <div class="acciones">
+        <button type="button" class="btn-principal" (click)="copiarPassword()">
+          {{ copiado() ? '✓ Copiada' : 'Copiar contraseña' }}
+        </button>
+        <button type="button" class="btn-secundario" (click)="cerrarCredenciales()">Listo</button>
+      </div>
+    </div>
+  }
+
+  @if (mostrarFormulario()) {
+    <form id="form-restaurante" class="tarjeta" [formGroup]="formRestaurante" (ngSubmit)="crearRestaurante()">
+      <h2>Nuevo restaurante</h2>
+      <div class="grid">
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" formControlName="nombre" required />
+        </div>
+        <div class="campo">
+          <label for="slug">Identificador (opcional)</label>
+          <input id="slug" formControlName="slug" placeholder="Se genera a partir del nombre" />
+        </div>
+        <div class="campo">
+          <label for="telefonoWhatsapp">Teléfono de WhatsApp</label>
+          <input id="telefonoWhatsapp" formControlName="telefonoWhatsapp" inputmode="tel" placeholder="573001112233" />
+        </div>
+        <div class="campo">
+          <label for="whatsappPhoneId">Phone Number ID (Meta)</label>
+          <input id="whatsappPhoneId" formControlName="whatsappPhoneId" required />
+        </div>
+        <div class="campo">
+          <label for="adminTelefono">Teléfono del administrador</label>
+          <input id="adminTelefono" formControlName="adminTelefono" inputmode="tel" required
+            aria-describedby="ayuda-admin" />
+          <small id="ayuda-admin">Es su usuario para entrar al panel.</small>
+        </div>
+        <div class="campo">
+          <label for="adminEmail">Correo del administrador (opcional)</label>
+          <input id="adminEmail" type="email" formControlName="adminEmail" />
+        </div>
+      </div>
+      <button type="submit" class="btn-principal" [disabled]="creando() || formRestaurante.invalid">
+        {{ creando() ? 'Creando…' : 'Crear restaurante' }}
+      </button>
+    </form>
+  }
+
+  @if (cargando()) {
+    <p role="status">Cargando…</p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table>
+        <caption class="sr-only">Restaurantes de la plataforma</caption>
+        <thead>
+          <tr>
+            <th scope="col">Restaurante</th>
+            <th scope="col">WhatsApp</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Pedidos 30 días</th>
+            <th scope="col">Último pedido</th>
+            <th scope="col"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of restaurantes(); track r.id) {
+            <tr>
+              <td>
+                <strong>{{ r.nombre }}</strong>
+                <span class="sub">{{ r.slug }} · {{ r.admins }} usuario(s)</span>
+              </td>
+              <td>
+                {{ r.telefonoWhatsapp ?? '—' }}
+                <span class="sub">ID {{ r.whatsappPhoneId }}</span>
+              </td>
+              <td>
+                <span class="estado" [class.activo]="r.activo" [class.suspendido]="!r.activo">
+                  {{ r.activo ? 'Activo' : 'Suspendido' }}
+                </span>
+              </td>
+              <td>{{ r.pedidosUltimos30Dias }}</td>
+              <td>{{ r.ultimoPedido ? (r.ultimoPedido | date: 'd MMM y, h:mm a') : '—' }}</td>
+              <td class="acciones">
+                <button type="button" class="btn-secundario" (click)="verUsuarios(r)"
+                  [attr.aria-expanded]="seleccionado()?.id === r.id">
+                  Usuarios
+                </button>
+                <button type="button" [class]="r.activo ? 'btn-peligro' : 'btn-principal'" (click)="cambiarEstado(r)">
+                  {{ r.activo ? 'Suspender' : 'Reactivar' }}
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6">No hay restaurantes.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (seleccionado(); as r) {
+      <section class="tarjeta" aria-labelledby="titulo-usuarios">
+        <h2 id="titulo-usuarios">Usuarios de {{ r.nombre }}</h2>
+
+        <ul class="usuarios">
+          @for (a of admins(); track a.id) {
+            <li>
+              <div>
+                <strong>{{ a.telefono }}</strong>
+                @if (a.rol === 'SUPERADMIN') { <span class="etiqueta">Superadmin</span> }
+                @if (!a.activo) { <span class="etiqueta etiqueta-gris">Desactivado</span> }
+                @if (a.debeCambiarPassword) { <span class="etiqueta etiqueta-aviso">Contraseña temporal</span> }
+                <span class="sub">{{ a.email ?? 'Sin correo' }}</span>
+              </div>
+              <div class="acciones">
+                <button type="button" class="btn-secundario" (click)="restablecerPassword(a)">
+                  Restablecer contraseña
+                </button>
+                <button type="button" class="btn-secundario" (click)="cambiarEstadoAdmin(a)">
+                  {{ a.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div>
+            </li>
+          } @empty {
+            <li>Cargando usuarios…</li>
+          }
+        </ul>
+
+        <form class="nuevo-admin" [formGroup]="formAdmin" (ngSubmit)="agregarAdmin()">
+          <h3>Agregar usuario</h3>
+          <div class="grid">
+            <div class="campo">
+              <label for="nuevoTelefono">Teléfono</label>
+              <input id="nuevoTelefono" formControlName="telefono" inputmode="tel" required />
+            </div>
+            <div class="campo">
+              <label for="nuevoEmail">Correo (opcional)</label>
+              <input id="nuevoEmail" type="email" formControlName="email" />
+            </div>
+          </div>
+          <button type="submit" class="btn-principal" [disabled]="formAdmin.invalid">Agregar</button>
+        </form>
+      </section>
+    }
+  }
+</div>

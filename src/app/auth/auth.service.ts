@@ -9,11 +9,15 @@ export interface LoginRequest {
   password: string;
 }
 
+export type RolAdmin = 'ADMIN' | 'SUPERADMIN';
+
 export interface LoginResponse {
   adminId: number;
   restauranteId: number;
   restauranteNombre: string;
   token: string;
+  rol?: RolAdmin;
+  debeCambiarPassword?: boolean;
 }
 
 // Claves de la sesión en localStorage. AuthService es el único que las lee o escribe.
@@ -23,6 +27,8 @@ const CLAVES = {
   adminId: 'admin_id',
   restauranteId: 'restaurante_id',
   restauranteNombre: 'restaurante_nombre',
+  rol: 'rol',
+  debeCambiarPassword: 'debe_cambiar_password',
 } as const;
 
 // Claves de versiones anteriores; se borran al cerrar sesión
@@ -49,6 +55,8 @@ export class AuthService {
     localStorage.setItem(CLAVES.adminId, String(res.adminId));
     localStorage.setItem(CLAVES.restauranteId, String(res.restauranteId));
     localStorage.setItem(CLAVES.restauranteNombre, res.restauranteNombre ?? '');
+    localStorage.setItem(CLAVES.rol, res.rol ?? 'ADMIN');
+    if (res.debeCambiarPassword) localStorage.setItem(CLAVES.debeCambiarPassword, 'true');
   }
 
   // ================= LOGOUT =================
@@ -76,6 +84,20 @@ export class AuthService {
 
   getRestauranteNombre(): string | null {
     return localStorage.getItem(CLAVES.restauranteNombre) || null;
+  }
+
+  // Solo controla qué se muestra; el backend valida el rol en cada petición
+  esSuperadmin(): boolean {
+    return localStorage.getItem(CLAVES.rol) === 'SUPERADMIN';
+  }
+
+  // Contraseña temporal asignada por el superadmin: hay que cambiarla antes de usar el panel
+  debeCambiarPassword(): boolean {
+    return localStorage.getItem(CLAVES.debeCambiarPassword) === 'true';
+  }
+
+  marcarPasswordCambiada(): void {
+    localStorage.removeItem(CLAVES.debeCambiarPassword);
   }
 
   isTokenExpired(): boolean {

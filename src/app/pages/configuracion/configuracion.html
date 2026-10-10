@@ -1,0 +1,93 @@
+<div class="config">
+  <header class="config-header">
+    <h1>Mi restaurante</h1>
+    <p>Esta información la usa el bot al responder a tus clientes por WhatsApp.</p>
+  </header>
+
+  @if (cargando()) {
+    <p class="cargando" role="status">Cargando…</p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="config-card">
+      <section>
+        <h2>Datos generales</h2>
+
+        <div class="campo">
+          <label for="nombre">Nombre del restaurante</label>
+          <input id="nombre" formControlName="nombre" required />
+        </div>
+
+        <div class="campo">
+          <label for="telefono">Número de WhatsApp</label>
+          <input id="telefono" [value]="telefono() ?? 'Sin configurar'" disabled aria-describedby="ayuda-telefono" />
+          <small id="ayuda-telefono">Lo configura el soporte de la plataforma.</small>
+        </div>
+
+        <div class="campo">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" formControlName="direccion" placeholder="Calle 10 # 20-30, Barrio Centro" />
+        </div>
+      </section>
+
+      <section>
+        <h2>Horario de atención</h2>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="horaInicio">Abre a las</label>
+            <input id="horaInicio" type="time" formControlName="horaInicio" />
+          </div>
+          <div class="campo">
+            <label for="horaFin">Cierra a las</label>
+            <input id="horaFin" type="time" formControlName="horaFin" aria-describedby="ayuda-horas" />
+          </div>
+        </div>
+        <small id="ayuda-horas" class="ayuda">
+          Fuera de este horario el bot avisa que el restaurante está cerrado. Si cierras después de medianoche
+          (p. ej. 18:00 a 02:00) también funciona. Déjalo vacío para atender todo el día.
+        </small>
+
+        <div class="campo">
+          <label for="horario">Horario que verán los clientes</label>
+          <textarea id="horario" formControlName="horario" rows="3"
+            placeholder="Lunes a sábado: 11:00 a. m. - 10:00 p. m."></textarea>
+        </div>
+      </section>
+
+      <section>
+        <h2>Pedidos</h2>
+
+        <div class="campo">
+          <label for="tiempoEstimado">Tiempo estimado de entrega</label>
+          <input id="tiempoEstimado" formControlName="tiempoEstimado" placeholder="25-40 minutos"
+            aria-describedby="ayuda-tiempo" />
+          <small id="ayuda-tiempo">Se muestra al confirmar el pedido. Si lo dejas vacío se usa "25-40 minutos".</small>
+        </div>
+
+        <div class="campo">
+          <label for="datosPago">Datos para pagos por Nequi o transferencia</label>
+          <textarea id="datosPago" formControlName="datosPago" rows="3" aria-describedby="ayuda-pago"
+            placeholder="Nequi 300 123 4567 a nombre de Restaurante SAS"></textarea>
+          <small id="ayuda-pago">El bot los envía cuando el cliente elige Nequi o transferencia.</small>
+        </div>
+
+        <div class="campo">
+          <label for="observacion">Aviso importante</label>
+          <textarea id="observacion" formControlName="observacion" rows="3" aria-describedby="ayuda-aviso"
+            placeholder="Hoy no tenemos servicio a domicilio en el norte"></textarea>
+          <small id="ayuda-aviso">Aparece en el saludo del bot. Déjalo vacío si no hay avisos.</small>
+        </div>
+      </section>
+
+      @if (error()) {
+        <div class="msg msg-error" role="alert">{{ error() }}</div>
+      }
+      @if (mensaje()) {
+        <div class="msg msg-ok" role="status">{{ mensaje() }}</div>
+      }
+
+      <button type="submit" class="guardar" [disabled]="guardando() || form.invalid">
+        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+      </button>
+    </form>
+  }
+</div>

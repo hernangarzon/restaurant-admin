@@ -1,5 +1,5 @@
 import { BotApiService } from '../../services/bot-api.service';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
@@ -10,6 +10,7 @@ import { EstadoPedido } from '../../models/estado-pedido';
 
 import { PedidoService } from '../../services/pedidos.service';
 import { RestauranteService } from '../../services/restaurante.service';
+import { NotificacionPedidosService } from '../../services/notificacion-pedidos.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -48,7 +49,18 @@ export class PedidosComponent implements OnInit, OnDestroy {
     private restauranteService: RestauranteService,
     private cdRef: ChangeDetectorRef,
     private botService: BotApiService,
-  ) { }
+  ) {
+    // Recargar la lista en cuanto el layout detecta un pedido nuevo
+    const notificaciones = inject(NotificacionPedidosService);
+    let ultimoVisto = 0;
+    effect(() => {
+      const id = notificaciones.ultimoPedidoId();
+      if (ultimoVisto && id > ultimoVisto && this.restaurante) {
+        this.cargarPedidos();
+      }
+      ultimoVisto = id;
+    });
+  }
 
   // =======================
   // CICLO DE VIDA

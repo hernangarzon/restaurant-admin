@@ -1,26 +1,41 @@
 // src/app/auth/auth.guard.ts
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
+
+const RUTA_CAMBIO_PASSWORD = '/admin/change-password';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate, CanActivateChild {
 
   constructor(
     private auth: AuthService,
     private router: Router
   ) {}
 
-  canActivate(): boolean {
-    if (this.auth.isLoggedIn() && !this.auth.isTokenExpired()) {
-      return true;
+  canActivate(_route: unknown, state: RouterStateSnapshot): boolean | UrlTree {
+    return this.verificar(state.url);
+  }
+
+  // También en cada navegación entre páginas hijas de /admin
+  canActivateChild(_route: unknown, state: RouterStateSnapshot): boolean | UrlTree {
+    return this.verificar(state.url);
+  }
+
+  private verificar(url: string): boolean | UrlTree {
+    if (!this.auth.isLoggedIn()) {
+      // Token expirado o no existe — limpiar sesión
+      this.auth.logout();
+      return this.router.parseUrl('/login');
     }
 
-    // Token expirado o no existe — limpiar sesión
-    this.auth.logout();
-    this.router.navigate(['/login']);
-    return false;
+    // Con contraseña temporal solo se permite la página para cambiarla
+    if (this.auth.debeCambiarPassword() && !url.startsWith(RUTA_CAMBIO_PASSWORD)) {
+      return this.router.parseUrl(RUTA_CAMBIO_PASSWORD);
+    }
+
+    return true;
   }
 }

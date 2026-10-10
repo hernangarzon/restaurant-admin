@@ -448,3 +448,38 @@
     transform: translateY(0);
   }
 }
+/* Sonido de pedidos nuevos */
+.btn-sonido {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-sonido-aviso {
+  background: #ffc069;
+  color: #3d2400;
+  border-color: #ffc069;
+}
+
+.btn-sonido:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.badge-nuevos {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #2e7d32;
+  color: #fff;
+}

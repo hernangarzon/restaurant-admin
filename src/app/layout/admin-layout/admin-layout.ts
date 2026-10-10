@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { interval, Subscription } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { PedidoService } from '../../services/pedidos.service';
+import { NotificacionPedidosService } from '../../services/notificacion-pedidos.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -20,6 +21,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   toastMensaje = '';
   private pollingSubscription?: Subscription;
   private anteriorConteo = 0;
+  readonly notificaciones = inject(NotificacionPedidosService);
+  readonly esSuperadmin: boolean;
 
   constructor(
     private router: Router,
@@ -28,6 +31,13 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     private pedidoService: PedidoService
   ) {
     this.username = this.authService.getUsername();
+    this.esSuperadmin = this.authService.esSuperadmin();
+
+    // Toast cuando entra un pedido nuevo (el sonido lo maneja el servicio)
+    effect(() => {
+      const aviso = this.notificaciones.ultimoAviso();
+      if (aviso) this.mostrarNotificacion(aviso.texto);
+    });
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.cdr.detectChanges();
     });
@@ -35,8 +45,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.consultarMensajes();
+    this.notificaciones.consultar();
     this.pollingSubscription = interval(15000).subscribe(() => {
       this.consultarMensajes();
+      this.notificaciones.consultar();
     });
   }
 
@@ -71,6 +83,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     const confirmar = window.confirm('🚪 ¿Estás seguro que deseas cerrar sesión?');
     if (confirmar) {
       this.authService.logout();
+      this.notificaciones.reiniciar();
       this.router.navigate(['/login']);
     }
   }

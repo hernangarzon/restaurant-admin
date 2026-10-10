@@ -23,6 +23,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         authService.logout();
         router.navigate(['/login']);
       }
+
+      // Restaurante suspendido por el superadmin: salir y explicar el motivo en el login
+      if (error.status === 403 && error.error?.codigo === 'RESTAURANTE_SUSPENDIDO') {
+        authService.logout();
+        router.navigate(['/login'], { queryParams: { suspendido: 1 } });
+      }
+
       return throwError(() => error);
     }),
   );
