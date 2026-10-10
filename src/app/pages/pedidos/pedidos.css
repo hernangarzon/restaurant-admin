@@ -1067,3 +1067,52 @@ div:has(> p:only-child):not(.no-results) p::before {
 .msg-right .bubble {
   background: #dcf8c6;
 }
+/* Pedidos con catálogo */
+.total-pedido {
+  display: block;
+  margin-top: 4px;
+  color: #1d6b35;
+}
+
+.items-pedido {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.items-pedido th,
+.items-pedido td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.items-pedido th:not(:first-child),
+.items-pedido td:not(:first-child) {
+  text-align: right;
+}
+
+.items-pedido small {
+  display: block;
+  color: #4b5563;
+}
+
+.items-pedido .fila-total td {
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.indicaciones {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #fff4e5;
+  border-radius: 8px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}

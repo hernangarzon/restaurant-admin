@@ -4,6 +4,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ConfiguracionRestauranteService } from '../../services/configuracion-restaurante.service';
 import { ConfiguracionRestaurante } from '../../models/configuracion-restaurante.model';
 
+/** '' o 0 → null (sin costo / sin mínimo) */
+function aPesos(valor: string | number): number | null {
+  const n = Math.round(Number(valor));
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 /** Datos del restaurante que usa el bot: horario, aviso, tiempo estimado, datos de pago... */
 @Component({
   selector: 'app-configuracion',
@@ -30,6 +36,9 @@ export class ConfiguracionComponent implements OnInit {
     observacion: [''],
     tiempoEstimado: ['', [Validators.maxLength(60)]],
     datosPago: [''],
+    // Texto (input number vacío = ''); se convierte a número o null al guardar
+    costoDomicilio: ['', [Validators.min(0)]],
+    pedidoMinimo: ['', [Validators.min(0)]],
   });
 
   ngOnInit(): void {
@@ -68,6 +77,8 @@ export class ConfiguracionComponent implements OnInit {
         observacion: v.observacion || null,
         tiempoEstimado: v.tiempoEstimado || null,
         datosPago: v.datosPago || null,
+        costoDomicilio: aPesos(v.costoDomicilio),
+        pedidoMinimo: aPesos(v.pedidoMinimo),
       })
       .subscribe({
         next: (c) => {
@@ -93,6 +104,8 @@ export class ConfiguracionComponent implements OnInit {
       observacion: c.observacion ?? '',
       tiempoEstimado: c.tiempoEstimado ?? '',
       datosPago: c.datosPago ?? '',
+      costoDomicilio: c.costoDomicilio != null ? String(c.costoDomicilio) : '',
+      pedidoMinimo: c.pedidoMinimo != null ? String(c.pedidoMinimo) : '',
     });
   }
 }

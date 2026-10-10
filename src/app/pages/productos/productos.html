@@ -1,0 +1,126 @@
+<div class="productos">
+  <header class="encabezado">
+    <div>
+      <h1>Productos</h1>
+      <p>
+        Lo que el bot ofrece en WhatsApp: el cliente elige de una lista y el bot calcula el total.
+        @if (!cargando() && activos() === 0) {
+          <strong>Sin productos activos, el bot recibe pedidos en texto libre.</strong>
+        }
+      </p>
+    </div>
+    @if (editando() === null) {
+      <button type="button" class="btn-principal" (click)="nuevo()">+ Nuevo producto</button>
+    }
+  </header>
+
+  @if (error()) {
+    <div class="msg msg-error" role="alert">{{ error() }}</div>
+  }
+  @if (mensaje()) {
+    <div class="msg msg-ok" role="status">{{ mensaje() }}</div>
+  }
+
+  @if (editando() !== null) {
+    <form class="tarjeta" [formGroup]="form" (ngSubmit)="guardar()" aria-labelledby="titulo-form">
+      <h2 id="titulo-form">{{ editando() ? 'Editar producto' : 'Nuevo producto' }}</h2>
+
+      <div class="grid">
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" formControlName="nombre" [maxlength]="maxNombre" required
+            aria-describedby="contador-nombre" />
+          <small id="contador-nombre">{{ form.controls.nombre.value.length }}/{{ maxNombre }} — límite de WhatsApp</small>
+        </div>
+
+        <div class="campo">
+          <label for="precio">Precio (pesos)</label>
+          <input id="precio" type="number" min="1" step="100" inputmode="numeric" formControlName="precio" required />
+        </div>
+
+        <div class="campo campo-ancho">
+          <label for="descripcion">Descripción (opcional)</label>
+          <input id="descripcion" formControlName="descripcion" [maxlength]="maxDescripcion"
+            placeholder="Con arroz, ensalada y jugo" aria-describedby="contador-desc" />
+          <small id="contador-desc">{{ form.controls.descripcion.value.length }}/{{ maxDescripcion }} — aparece debajo del nombre en la lista</small>
+        </div>
+
+        <div class="campo">
+          <label for="orden">Orden en la lista</label>
+          <input id="orden" type="number" min="0" formControlName="orden" aria-describedby="ayuda-orden" />
+          <small id="ayuda-orden">Los números menores aparecen primero.</small>
+        </div>
+
+        <div class="campo campo-check">
+          <input id="activo" type="checkbox" formControlName="activo" />
+          <label for="activo">Disponible para pedir</label>
+        </div>
+      </div>
+
+      <fieldset class="dias">
+        <legend>Días en que se ofrece</legend>
+        <div class="dias-opciones">
+          @for (d of dias; track d.valor) {
+            <label class="dia" [class.marcado]="diasSeleccionados().has(d.valor)">
+              <input type="checkbox" [checked]="diasSeleccionados().has(d.valor)" (change)="alternarDia(d.valor)" />
+              {{ d.corto }}
+            </label>
+          }
+        </div>
+        <small>Si no marcas ninguno, se ofrece todos los días.</small>
+      </fieldset>
+
+      <div class="acciones">
+        <button type="submit" class="btn-principal" [disabled]="guardando() || form.invalid">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+        <button type="button" class="btn-secundario" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  @if (cargando()) {
+    <p role="status">Cargando…</p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table>
+        <caption class="sr-only">Productos del restaurante</caption>
+        <thead>
+          <tr>
+            <th scope="col">Producto</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Días</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of productos(); track p.id) {
+            <tr [class.inactivo]="!p.activo">
+              <td>
+                <strong>{{ p.nombre }}</strong>
+                @if (p.descripcion) { <span class="sub">{{ p.descripcion }}</span> }
+              </td>
+              <td>{{ p.precio | pesos }}</td>
+              <td>{{ textoDias(p) }}</td>
+              <td>
+                <span class="estado" [class.activo]="p.activo">{{ p.activo ? 'Disponible' : 'Oculto' }}</span>
+              </td>
+              <td class="acciones">
+                <button type="button" class="btn-secundario" (click)="editar(p)">Editar</button>
+                <button type="button" class="btn-secundario" (click)="alternarActivo(p)">
+                  {{ p.activo ? 'Ocultar' : 'Mostrar' }}
+                </button>
+                <button type="button" class="btn-peligro" (click)="eliminar(p)">Eliminar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">Aún no tienes productos. Crea el primero con "Nuevo producto".</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

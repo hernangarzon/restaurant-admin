@@ -1,74 +1,143 @@
 <div class="dashboard-container">
-  
-  <!-- Header del Dashboard -->
+
   <div class="dashboard-header">
     <h1>Dashboard</h1>
     <p class="dashboard-subtitle">Resumen general y métricas de tu restaurante</p>
   </div>
 
-  <!-- Tarjetas de estadísticas principales -->
-  <div class="cards-grid">
-    
-    <!-- Pedidos Hoy -->
-    <div class="stat-card">
-      <h3>Pedidos Hoy</h3>
-      <div class="card-value">{{ pedidosHoy }}</div>
+  <!-- Filtro del período: una sola fila encima de todo lo que depende de él -->
+  <div class="periodo" role="group" aria-label="Período de las métricas">
+    @for (d of opcionesPeriodo; track d) {
+      <button type="button" class="periodo-opcion" [class.activo]="periodo() === d"
+        [attr.aria-pressed]="periodo() === d" (click)="cambiarPeriodo(d)">
+        Últimos {{ d }} días
+      </button>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="msg-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (reporte(); as r) {
+    <!-- Indicadores principales -->
+    <div class="cards-grid" [class.cargando]="cargando()">
+      <div class="stat-card">
+        <h3>Ventas de hoy</h3>
+        <div class="card-value">{{ r.ventasHoy | pesos }}</div>
+        <p class="card-nota">{{ r.pedidosHoy }} pedido(s) hoy</p>
+      </div>
+      <div class="stat-card">
+        <h3>Ventas {{ r.dias }} días</h3>
+        <div class="card-value">{{ r.ventasPeriodo | pesos }}</div>
+        <p class="card-nota">{{ r.pedidosPeriodo }} pedido(s)</p>
+      </div>
+      <div class="stat-card">
+        <h3>Ticket promedio</h3>
+        <div class="card-value">{{ r.ticketPromedio | pesos }}</div>
+        <p class="card-nota">Por pedido con catálogo</p>
+      </div>
+      <div class="stat-card">
+        <h3>Clientes</h3>
+        <div class="card-value">{{ r.clientesUnicos }}</div>
+        <p class="card-nota">{{ r.clientesRecurrentes }} repitieron en el período</p>
+      </div>
     </div>
 
-    
-  </div>
+    <!-- Ventas por día: una serie, sin leyenda (el título la nombra) -->
+    <section class="grafico-card" aria-labelledby="titulo-ventas">
+      <h2 id="titulo-ventas" class="section-title">Ventas por día</h2>
+
+      @if (hayVentas()) {
+        <div class="grafico" (mouseleave)="seleccionada.set(null)">
+          <div class="eje-y" aria-hidden="true">
+            <span>{{ maximoEje() | pesos }}</span>
+            <span>{{ maximoEje() / 2 | pesos }}</span>
+            <span>$0</span>
+          </div>
+
+          <div class="area">
+            <div class="linea-guia" style="top: 0"></div>
+            <div class="linea-guia" style="top: 50%"></div>
+
+            <div class="barras">
+              @for (b of barras(); track b.fecha; let i = $index, n = $count) {
+                <!-- La columna completa es el área de hover/foco; la barra visible es más angosta.
+                     Cerca de los bordes el tooltip se alinea hacia adentro para no salirse. -->
+                <button type="button" class="columna" [class.tip-izq]="i < n / 4" [class.tip-der]="i >= (n * 3) / 4"
+                  (mouseenter)="seleccionada.set(b)" (focus)="seleccionada.set(b)"
+                  (blur)="seleccionada.set(null)"
+                  [attr.aria-label]="(b.fecha | date: 'd MMM') + ': ' + (b.ventas | pesos) + ', ' + b.pedidos + ' pedido(s)'">
+                  <span class="barra" [style.height.%]="b.alto"></span>
+                  @if (seleccionada()?.fecha === b.fecha) {
+                    <span class="tooltip" role="status">
+                      <strong>{{ b.fecha | date: 'EEE d MMM' }}</strong>
+                      {{ b.ventas | pesos }} · {{ b.pedidos }} pedido(s)
+                    </span>
+                  }
+                </button>
+              }
+            </div>
+
+            <div class="eje-x" aria-hidden="true">
+              @for (b of barras(); track b.fecha) {
+                <span>{{ b.etiqueta ? (b.fecha | date: 'd MMM') : '' }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <details class="vista-tabla">
+          <summary>Ver como tabla</summary>
+          <table>
+            <thead>
+              <tr><th scope="col">Fecha</th><th scope="col">Pedidos</th><th scope="col">Ventas</th></tr>
+            </thead>
+            <tbody>
+              @for (b of barras(); track b.fecha) {
+                <tr><td>{{ b.fecha | date: 'EEE d MMM' }}</td><td>{{ b.pedidos }}</td><td>{{ b.ventas | pesos }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </details>
+      } @else {
+        <p class="vacio">
+          Aún no hay ventas registradas en este período. Las ventas se calculan con los pedidos hechos
+          desde el catálogo de <strong>Productos</strong>.
+        </p>
+      }
+    </section>
+
+    <!-- Productos más vendidos -->
+    @if (r.topProductos.length) {
+      <section class="grafico-card" aria-labelledby="titulo-top">
+        <h2 id="titulo-top" class="section-title">Productos más vendidos</h2>
+        <table class="top">
+          <thead>
+            <tr><th scope="col">Producto</th><th scope="col">Unidades</th><th scope="col">Ventas</th></tr>
+          </thead>
+          <tbody>
+            @for (p of r.topProductos; track p.nombre) {
+              <tr><td>{{ p.nombre }}</td><td>{{ p.cantidad }}</td><td>{{ p.ventas | pesos }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+  } @else if (cargando()) {
+    <p role="status">Cargando métricas…</p>
+  }
 
   <!-- Estados de Pedidos -->
   <h2 class="section-title">Estados de Pedidos</h2>
-  
+
   <div class="estados-grid">
-    <div class="estado-card" *ngFor="let e of porEstado | keyvalue" [attr.data-estado]="e.key">
-      <span class="estado-nombre">{{ e.key }}</span>
-      <span class="estado-valor">{{ e.value }}</span>
-    </div>
+    @for (e of porEstado() | keyvalue; track e.key) {
+      <div class="estado-card" [attr.data-estado]="e.key">
+        <span class="estado-nombre">{{ e.key }}</span>
+        <span class="estado-valor">{{ e.value }}</span>
+      </div>
+    }
   </div>
-
-  <!-- Sección de gráficos (opcional - puedes agregar después) -->
-  <!--
-  <div class="charts-section">
-    <div class="chart-card">
-      <h3>📈 Pedidos por Hora</h3>
-      <canvas id="pedidosChart"></canvas>
-    </div>
-    <div class="chart-card">
-      <h3>🍽️ Productos Más Vendidos</h3>
-      <canvas id="productosChart"></canvas>
-    </div>
-  </div>
-  -->
-
-  <!-- Últimos pedidos (opcional) -->
-  <!--
-  <div class="recent-orders">
-    <h2 class="section-title">🔄 Últimos Pedidos</h2>
-    <div class="orders-table">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th>Hora</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of ultimosPedidos">
-            <td>#{{ order.id }}</td>
-            <td>{{ order.cliente }}</td>
-            <td>${{ order.total }}</td>
-            <td><span class="status-badge" [class]="order.estado">{{ order.estado }}</span></td>
-            <td>{{ order.hora }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  -->
 
 </div>

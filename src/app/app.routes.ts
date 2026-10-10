@@ -27,6 +27,10 @@ export const routes: Routes = [
       { path: 'menu-dia', component: MenuDiaComponent },
       { path: 'change-password', component: ChangePasswordComponent},
       {
+        path: 'productos',
+        loadComponent: () => import('./pages/productos/productos').then((m) => m.ProductosComponent),
+      },
+      {
         path: 'configuracion',
         loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.ConfiguracionComponent),
       },

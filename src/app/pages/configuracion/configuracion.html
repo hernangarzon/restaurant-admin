@@ -63,6 +63,23 @@
           <small id="ayuda-tiempo">Se muestra al confirmar el pedido. Si lo dejas vacío se usa "25-40 minutos".</small>
         </div>
 
+        <div class="fila">
+          <div class="campo">
+            <label for="costoDomicilio">Valor del domicilio</label>
+            <input id="costoDomicilio" type="number" min="0" step="500" inputmode="numeric"
+              formControlName="costoDomicilio" placeholder="0" aria-describedby="ayuda-domicilio" />
+          </div>
+          <div class="campo">
+            <label for="pedidoMinimo">Pedido mínimo</label>
+            <input id="pedidoMinimo" type="number" min="0" step="1000" inputmode="numeric"
+              formControlName="pedidoMinimo" placeholder="Sin mínimo" aria-describedby="ayuda-domicilio" />
+          </div>
+        </div>
+        <small id="ayuda-domicilio" class="ayuda">
+          En pesos. Se suman al total cuando el cliente pide con el catálogo de productos. El pedido mínimo
+          no incluye el domicilio. Déjalos vacíos si no aplican.
+        </small>
+
         <div class="campo">
           <label for="datosPago">Datos para pagos por Nequi o transferencia</label>
           <textarea id="datosPago" formControlName="datosPago" rows="3" aria-describedby="ayuda-pago"

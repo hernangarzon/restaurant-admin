@@ -1,4 +1,5 @@
 import { BotApiService } from '../../services/bot-api.service';
+import { PesosPipe } from '../../pipes/pesos.pipe';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +16,7 @@ import { NotificacionPedidosService } from '../../services/notificacion-pedidos.
 @Component({
   selector: 'app-pedidos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PesosPipe],
   templateUrl: './pedidos.html',
   styleUrls: ['./pedidos.css'],
 })

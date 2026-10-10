@@ -8,4 +8,6 @@ export interface ConfiguracionRestaurante {
   observacion: string | null;
   tiempoEstimado: string | null;
   datosPago: string | null;
+  costoDomicilio: number | null; // pesos; null = sin costo
+  pedidoMinimo: number | null;   // pesos, sin domicilio; null = sin mínimo
 }

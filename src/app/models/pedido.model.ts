@@ -19,4 +19,18 @@ export interface Pedido {
   };
   telefonoCliente?: string;
   nombreCliente?: string;
+  clienteId?: number;
+  // Pedido hecho con el catálogo (nulos/vacío en pedidos de texto libre)
+  observacion?: string | null;
+  subtotal?: number | null;
+  costoDomicilio?: number | null;
+  total?: number | null;
+  items?: ItemPedido[];
+}
+
+export interface ItemPedido {
+  nombre: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
 }

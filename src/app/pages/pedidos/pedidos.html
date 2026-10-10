@@ -85,7 +85,12 @@
         <td>{{ p.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ p.telefonoCliente || 'Sin teléfono' }}</td>
         <td>{{ p.nombreCliente || '—' }}</td>
-        <td>{{ p.descripcion }}</td>
+        <td>
+          {{ p.descripcion }}
+          @if (p.total != null) {
+            <strong class="total-pedido">{{ p.total | pesos }}</strong>
+          }
+        </td>
 
         <td>
           <span *ngIf="p.estado !== 'ENTREGADO'; else finalizado" class="badge estado-animado"
@@ -149,9 +154,40 @@
 
         <div class="detail-section">
           <h3>🍽️ Descripción del Pedido</h3>
-          <div class="description-box">
-            {{ pedidoSeleccionado.descripcion || 'Sin descripción' }}
-          </div>
+          @if (pedidoSeleccionado.items?.length) {
+            <!-- Pedido hecho con el catálogo: productos con precio del momento del pedido -->
+            <table class="items-pedido">
+              <caption class="sr-only">Productos del pedido</caption>
+              <thead>
+                <tr><th scope="col">Producto</th><th scope="col">Cant.</th><th scope="col">Subtotal</th></tr>
+              </thead>
+              <tbody>
+                @for (i of pedidoSeleccionado.items; track $index) {
+                  <tr>
+                    <td>{{ i.nombre }} <small>{{ i.precioUnitario | pesos }} c/u</small></td>
+                    <td>{{ i.cantidad }}</td>
+                    <td>{{ i.subtotal | pesos }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                @if (pedidoSeleccionado.costoDomicilio) {
+                  <tr><td colspan="2">Domicilio</td><td>{{ pedidoSeleccionado.costoDomicilio | pesos }}</td></tr>
+                }
+                <tr class="fila-total"><td colspan="2">Total</td><td>{{ pedidoSeleccionado.total | pesos }}</td></tr>
+              </tfoot>
+            </table>
+            @if (pedidoSeleccionado.descripcion.includes('Modificación')) {
+              <div class="description-box">{{ pedidoSeleccionado.descripcion }}</div>
+            }
+          } @else {
+            <div class="description-box">
+              {{ pedidoSeleccionado.descripcion || 'Sin descripción' }}
+            </div>
+          }
+          @if (pedidoSeleccionado.observacion) {
+            <p class="indicaciones"><strong>📝 Indicaciones:</strong> {{ pedidoSeleccionado.observacion }}</p>
+          }
         </div>
 
         <div class="detail-section">

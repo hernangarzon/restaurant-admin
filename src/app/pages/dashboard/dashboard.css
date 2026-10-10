@@ -256,3 +256,256 @@
 .estado-card:nth-child(4) { animation-delay: 0.5s; }
 .estado-card:nth-child(5) { animation-delay: 0.6s; }
 .estado-card:nth-child(6) { animation-delay: 0.7s; }
+/* ===== Reportes ===== */
+.dashboard-container {
+  --serie-1: #2a78d6;        /* una sola serie: ventas (validada con validate_palette) */
+  --texto-secundario: #52514e;
+  --guia: #e6e6e3;
+}
+
+.periodo {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.periodo-opcion {
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #b2bec3;
+  background: #fff;
+  color: #2d3436;
+  cursor: pointer;
+}
+
+.periodo-opcion.activo {
+  background: #2d3436;
+  border-color: #2d3436;
+  color: #fff;
+}
+
+.periodo-opcion:focus-visible,
+.columna:focus-visible {
+  outline: 3px solid #2d3436;
+  outline-offset: 2px;
+}
+
+/* Escritorio: las 4 tarjetas en una fila (en móvil sigue la columna única de arriba) */
+@media (min-width: 769px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+.cards-grid.cargando {
+  opacity: 0.6;
+}
+
+.grafico-card .section-title {
+  margin-top: 0;
+}
+
+.card-value {
+  font-size: clamp(22px, 1.1vw + 12px, 34px);
+  white-space: nowrap;
+}
+
+.card-nota {
+  color: var(--texto-secundario);
+  font-size: 14px;
+}
+
+.msg-error {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #fdecea;
+  color: #8a1c13;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.grafico-card {
+  background: #fcfcfb;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.grafico {
+  display: flex;
+  gap: 8px;
+  height: 240px;
+}
+
+.eje-y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  color: var(--texto-secundario);
+  font-size: 12px;
+  padding-bottom: 22px; /* alto del eje x */
+  min-width: 70px;
+}
+
+.eje-y span {
+  transform: translateY(-50%);
+}
+
+.eje-y span:last-child {
+  transform: none;
+}
+
+.area {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.linea-guia {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--guia);
+}
+
+.barras {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px; /* separación entre barras */
+  border-bottom: 1px solid #b2bec3; /* línea base */
+}
+
+.columna {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: default;
+}
+
+.barra {
+  width: 100%;
+  max-width: 24px;
+  min-height: 0;
+  background: var(--serie-1);
+  border-radius: 4px 4px 0 0; /* punta redondeada, base recta */
+}
+
+.columna:hover .barra,
+.columna:focus-visible .barra {
+  filter: brightness(0.85);
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: #2d3436;
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.columna.tip-izq .tooltip {
+  left: 0;
+  transform: none;
+}
+
+.columna.tip-der .tooltip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.tooltip strong {
+  display: block;
+}
+
+.eje-x {
+  display: flex;
+  gap: 2px;
+  height: 22px;
+  color: var(--texto-secundario);
+  font-size: 12px;
+}
+
+.eje-x span {
+  flex: 1;
+  min-width: 0; /* la etiqueta puede salirse de su columna sin ensanchar el gráfico */
+  text-align: center;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.vista-tabla {
+  margin-top: 16px;
+}
+
+.vista-tabla summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.vista-tabla table,
+.top {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.vista-tabla th,
+.vista-tabla td,
+.top th,
+.top td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.vista-tabla td:not(:first-child),
+.vista-tabla th:not(:first-child),
+.top td:not(:first-child),
+.top th:not(:first-child) {
+  text-align: right;
+}
+
+.vacio {
+  color: var(--texto-secundario);
+}
+
+@media (max-width: 600px) {
+  .eje-y {
+    min-width: 56px;
+    font-size: 11px;
+  }
+}
+
+/* Sin animaciones si el usuario las desactivó en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  .stat-card,
+  .stat-card::before {
+    animation: none;
+    opacity: 1;
+  }
+}
