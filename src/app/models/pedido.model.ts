@@ -31,6 +31,7 @@ export interface Pedido {
 export interface ItemPedido {
   nombre: string;
   cantidad: number;
-  precioUnitario: number;
+  precioUnitario: number; // incluye las adiciones
   subtotal: number;
+  adiciones?: string | null; // "Helado, Queso"
 }

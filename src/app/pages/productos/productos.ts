@@ -8,6 +8,8 @@ import {
   Producto,
 } from '../../models/producto.model';
 import { DiaSemana } from '../../models/menu-dia.model';
+import { Adicion, MAX_ADICIONES_POR_PRODUCTO } from '../../models/adicion.model';
+import { AdicionesService } from '../../services/adiciones.service';
 import { PesosPipe } from '../../pipes/pesos.pipe';
 
 const DIAS: { valor: DiaSemana; corto: string }[] = [
@@ -48,8 +50,24 @@ export class ProductosComponent implements OnInit {
   /** null = formulario cerrado; 0 = nuevo; >0 = editando ese id */
   readonly editando = signal<number | null>(null);
   readonly diasSeleccionados = signal<Set<DiaSemana>>(new Set());
+  readonly adicionesSeleccionadas = signal<Set<number>>(new Set());
 
   readonly activos = computed(() => this.productos().filter((p) => p.activo).length);
+
+  // ===== Adiciones =====
+  private readonly adicionesService = inject(AdicionesService);
+  readonly maxAdiciones = MAX_ADICIONES_POR_PRODUCTO;
+  readonly adiciones = signal<Adicion[]>([]);
+  /** null = sin editar; 0 = nueva; >0 = editando esa adición */
+  readonly editandoAdicion = signal<number | null>(null);
+  readonly formAdicion = this.fb.group({
+    nombre: ['', [Validators.required, Validators.maxLength(MAX_NOMBRE_PRODUCTO)]],
+    precio: [0, [Validators.required, Validators.min(0)]],
+    activo: [true],
+  });
+  private readonly nombresAdiciones = computed(
+    () => new Map(this.adiciones().map((a) => [a.id!, a.nombre] as const)),
+  );
 
   readonly form = this.fb.group({
     nombre: ['', [Validators.required, Validators.maxLength(MAX_NOMBRE_PRODUCTO)]],
@@ -61,11 +79,13 @@ export class ProductosComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+    this.cargarAdiciones();
   }
 
   nuevo(): void {
     this.form.reset({ nombre: '', descripcion: '', precio: 0, orden: this.productos().length, activo: true });
     this.diasSeleccionados.set(new Set());
+    this.adicionesSeleccionadas.set(new Set());
     this.editando.set(0);
     this.limpiarMensajes();
   }
@@ -79,6 +99,7 @@ export class ProductosComponent implements OnInit {
       activo: p.activo,
     });
     this.diasSeleccionados.set(new Set(p.dias));
+    this.adicionesSeleccionadas.set(new Set(p.adicionIds ?? []));
     this.editando.set(p.id ?? null);
     this.limpiarMensajes();
   }
@@ -107,6 +128,7 @@ export class ProductosComponent implements OnInit {
       orden: Math.round(Number(v.orden)) || 0,
       activo: v.activo,
       dias: [...this.diasSeleccionados()],
+      adicionIds: [...this.adicionesSeleccionadas()],
     };
     const id = this.editando();
 
@@ -140,6 +162,81 @@ export class ProductosComponent implements OnInit {
     this.servicio.eliminar(p.id).subscribe({
       next: () => this.cargar(),
       error: (err: HttpErrorResponse) => this.error.set(err.error?.mensaje ?? 'No se pudo eliminar.'),
+    });
+  }
+
+  alternarAdicionDelProducto(id: number): void {
+    const elegidas = new Set(this.adicionesSeleccionadas());
+    if (elegidas.has(id)) {
+      elegidas.delete(id);
+    } else if (elegidas.size < MAX_ADICIONES_POR_PRODUCTO) {
+      elegidas.add(id);
+    }
+    this.adicionesSeleccionadas.set(elegidas);
+  }
+
+  textoAdiciones(p: Producto): string {
+    const nombres = (p.adicionIds ?? []).map((id) => this.nombresAdiciones().get(id)).filter(Boolean);
+    return nombres.length ? nombres.join(', ') : '—';
+  }
+
+  // ===== Adiciones =====
+
+  nuevaAdicion(): void {
+    this.formAdicion.reset({ nombre: '', precio: 0, activo: true });
+    this.editandoAdicion.set(0);
+    this.limpiarMensajes();
+  }
+
+  editarAdicion(a: Adicion): void {
+    this.formAdicion.reset({ nombre: a.nombre, precio: a.precio, activo: a.activo });
+    this.editandoAdicion.set(a.id ?? null);
+    this.limpiarMensajes();
+  }
+
+  cancelarAdicion(): void {
+    this.editandoAdicion.set(null);
+  }
+
+  guardarAdicion(): void {
+    if (this.formAdicion.invalid) return;
+    const v = this.formAdicion.getRawValue();
+    const id = this.editandoAdicion();
+    const actual = this.adiciones().find((a) => a.id === id);
+    const adicion: Adicion = {
+      nombre: v.nombre.trim(),
+      precio: Math.round(Number(v.precio)),
+      activo: v.activo,
+      orden: actual?.orden ?? this.adiciones().length,
+    };
+
+    this.limpiarMensajes();
+    const peticion = id ? this.adicionesService.actualizar(id, adicion) : this.adicionesService.crear(adicion);
+    peticion.subscribe({
+      next: () => {
+        this.editandoAdicion.set(null);
+        this.mensaje.set(id ? 'Adición actualizada.' : 'Adición creada. Márcala en los productos que la admiten.');
+        this.cargarAdiciones();
+      },
+      error: (err: HttpErrorResponse) => this.error.set(err.error?.mensaje ?? 'No se pudo guardar la adición.'),
+    });
+  }
+
+  eliminarAdicion(a: Adicion): void {
+    if (!a.id || !confirm(`¿Eliminar la adición "${a.nombre}"? Se quitará de los productos que la tenían.`)) return;
+    this.adicionesService.eliminar(a.id).subscribe({
+      next: () => {
+        this.cargarAdiciones();
+        this.cargar(); // los productos pierden esa adición
+      },
+      error: (err: HttpErrorResponse) => this.error.set(err.error?.mensaje ?? 'No se pudo eliminar la adición.'),
+    });
+  }
+
+  private cargarAdiciones(): void {
+    this.adicionesService.listar().subscribe({
+      next: (lista) => this.adiciones.set(lista),
+      error: () => this.error.set('No se pudieron cargar las adiciones.'),
     });
   }
 

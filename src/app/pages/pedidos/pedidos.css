@@ -1116,3 +1116,9 @@ div:has(> p:only-child):not(.no-results) p::before {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+.items-pedido .adiciones-item {
+  display: block;
+  font-weight: 600;
+  color: #8a4b00;
+}

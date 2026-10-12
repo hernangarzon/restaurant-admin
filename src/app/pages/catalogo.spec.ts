@@ -42,6 +42,7 @@ describe('Catálogo y reportes', () => {
     const fixture = TestBed.createComponent(ProductosComponent);
     fixture.detectChanges();
     http.expectOne(`${API_URL}/admin/productos`).flush([]);
+    http.expectOne(`${API_URL}/admin/adiciones`).flush([]);
 
     const c = fixture.componentInstance;
     c.nuevo();
@@ -54,6 +55,7 @@ describe('Catálogo y reportes', () => {
     const post = http.expectOne((r) => r.method === 'POST' && r.url === `${API_URL}/admin/productos`);
     expect(post.request.body).toEqual({
       nombre: 'Bandeja paisa', descripcion: null, precio: 22000, orden: 0, activo: true, dias: ['LUNES'],
+      adicionIds: [],
     });
     post.flush({ id: 1, ...post.request.body });
     http.expectOne(`${API_URL}/admin/productos`).flush([{ id: 1, ...post.request.body }]);
@@ -67,6 +69,7 @@ describe('Catálogo y reportes', () => {
     const fixture = TestBed.createComponent(ProductosComponent);
     fixture.detectChanges();
     http.expectOne(`${API_URL}/admin/productos`).flush([]);
+    http.expectOne(`${API_URL}/admin/adiciones`).flush([]);
 
     const c = fixture.componentInstance;
     c.nuevo();
@@ -75,6 +78,47 @@ describe('Catálogo y reportes', () => {
 
     expect(c.form.invalid).toBe(true);
     http.expectNone((r) => r.method === 'POST');
+  });
+
+  it('Productos marca adiciones (máximo 9) y las envía con el producto', () => {
+    const fixture = TestBed.createComponent(ProductosComponent);
+    fixture.detectChanges();
+    http.expectOne(`${API_URL}/admin/productos`).flush([]);
+    const diez = Array.from({ length: 10 }, (_, i) => ({ id: i + 1, nombre: `A${i + 1}`, precio: 1000, activo: true, orden: i }));
+    http.expectOne(`${API_URL}/admin/adiciones`).flush(diez);
+
+    const c = fixture.componentInstance;
+    c.nuevo();
+    c.form.patchValue({ nombre: 'Ensalada especial', precio: 15000 });
+    diez.forEach((a) => c.alternarAdicionDelProducto(a.id));
+    expect(c.adicionesSeleccionadas().size).toBe(9); // la décima no entra
+    c.alternarAdicionDelProducto(1);                   // desmarca una
+    c.guardar();
+
+    const post = http.expectOne((r) => r.method === 'POST' && r.url === `${API_URL}/admin/productos`);
+    expect(post.request.body.adicionIds).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
+    post.flush({ id: 1, ...post.request.body });
+    http.expectOne(`${API_URL}/admin/productos`).flush([{ id: 1, ...post.request.body }]);
+    expect(c.textoAdiciones(c.productos()[0])).toBe('A2, A3, A4, A5, A6, A7, A8, A9');
+  });
+
+  it('Productos crea una adición', () => {
+    const fixture = TestBed.createComponent(ProductosComponent);
+    fixture.detectChanges();
+    http.expectOne(`${API_URL}/admin/productos`).flush([]);
+    http.expectOne(`${API_URL}/admin/adiciones`).flush([]);
+
+    const c = fixture.componentInstance;
+    c.nuevaAdicion();
+    c.formAdicion.patchValue({ nombre: ' Helado ', precio: 2500 });
+    c.guardarAdicion();
+
+    const post = http.expectOne((r) => r.method === 'POST' && r.url === `${API_URL}/admin/adiciones`);
+    expect(post.request.body).toEqual({ nombre: 'Helado', precio: 2500, activo: true, orden: 0 });
+    post.flush({ id: 7, ...post.request.body });
+    http.expectOne(`${API_URL}/admin/adiciones`).flush([{ id: 7, ...post.request.body }]);
+    expect(c.adiciones().length).toBe(1);
+    expect(c.editandoAdicion()).toBeNull();
   });
 
   it('Dashboard dibuja una barra por día con eje legible y muestra el top', () => {

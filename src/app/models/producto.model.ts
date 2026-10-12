@@ -8,6 +8,7 @@ export interface Producto {
   activo: boolean;
   orden: number;
   dias: DiaSemana[];   // vacío = todos los días
+  adicionIds: number[]; // adiciones que admite (máx. 9)
 }
 
 export const MAX_NOMBRE_PRODUCTO = 24;

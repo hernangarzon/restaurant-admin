@@ -164,7 +164,11 @@
               <tbody>
                 @for (i of pedidoSeleccionado.items; track $index) {
                   <tr>
-                    <td>{{ i.nombre }} <small>{{ i.precioUnitario | pesos }} c/u</small></td>
+                    <td>
+                      {{ i.nombre }}
+                      @if (i.adiciones) { <span class="adiciones-item">+ {{ i.adiciones }}</span> }
+                      <small>{{ i.precioUnitario | pesos }} c/u</small>
+                    </td>
                     <td>{{ i.cantidad }}</td>
                     <td>{{ i.subtotal | pesos }}</td>
                   </tr>

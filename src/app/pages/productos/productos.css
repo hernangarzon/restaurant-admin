@@ -232,3 +232,55 @@ button:focus-visible {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+/* Adiciones */
+.tarjeta .encabezado h2 {
+  margin-bottom: 4px;
+}
+
+.form-adicion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+  align-items: flex-end;
+  margin: 16px 0;
+}
+
+.form-adicion .campo {
+  min-width: 180px;
+}
+
+.form-adicion .acciones {
+  margin-bottom: 14px;
+}
+
+.lista-adiciones {
+  list-style: none;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lista-adiciones li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid #edf0f2;
+  border-radius: 10px;
+}
+
+.lista-adiciones li.inactivo {
+  color: #6b7280;
+}
+
+.dia.inactiva {
+  border-style: dashed;
+}
+
+.dia input:disabled + * {
+  opacity: 0.6;
+}

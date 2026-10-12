@@ -30,7 +30,10 @@
           <label for="nombre">Nombre</label>
           <input id="nombre" formControlName="nombre" [maxlength]="maxNombre" required
             aria-describedby="contador-nombre" />
-          <small id="contador-nombre">{{ form.controls.nombre.value.length }}/{{ maxNombre }} — límite de WhatsApp</small>
+          <small id="contador-nombre">
+            {{ form.controls.nombre.value.length }}/{{ maxNombre }} — límite de WhatsApp. Usa un nombre corto
+            ("Ensalada especial") y pon el detalle en la descripción.
+          </small>
         </div>
 
         <div class="campo">
@@ -70,6 +73,27 @@
         <small>Si no marcas ninguno, se ofrece todos los días.</small>
       </fieldset>
 
+      <fieldset class="dias">
+        <legend>Adiciones que admite</legend>
+        @if (adiciones().length) {
+          <div class="dias-opciones">
+            @for (a of adiciones(); track a.id) {
+              <label class="dia" [class.marcado]="adicionesSeleccionadas().has(a.id!)" [class.inactiva]="!a.activo">
+                <input type="checkbox" [checked]="adicionesSeleccionadas().has(a.id!)"
+                  [disabled]="!adicionesSeleccionadas().has(a.id!) && adicionesSeleccionadas().size >= maxAdiciones"
+                  (change)="alternarAdicionDelProducto(a.id!)" />
+                {{ a.nombre }} (+{{ a.precio | pesos }})
+              </label>
+            }
+          </div>
+          <small>
+            Después de la cantidad, el bot le ofrece estas adiciones al cliente. Máximo {{ maxAdiciones }} por producto.
+          </small>
+        } @else {
+          <small>Aún no tienes adiciones. Créalas en la sección <strong>Adiciones</strong> más abajo.</small>
+        }
+      </fieldset>
+
       <div class="acciones">
         <button type="submit" class="btn-principal" [disabled]="guardando() || form.invalid">
           {{ guardando() ? 'Guardando…' : 'Guardar' }}
@@ -90,6 +114,7 @@
             <th scope="col">Producto</th>
             <th scope="col">Precio</th>
             <th scope="col">Días</th>
+            <th scope="col">Adiciones</th>
             <th scope="col">Estado</th>
             <th scope="col"><span class="sr-only">Acciones</span></th>
           </tr>
@@ -103,6 +128,7 @@
               </td>
               <td>{{ p.precio | pesos }}</td>
               <td>{{ textoDias(p) }}</td>
+              <td>{{ textoAdiciones(p) }}</td>
               <td>
                 <span class="estado" [class.activo]="p.activo">{{ p.activo ? 'Disponible' : 'Oculto' }}</span>
               </td>
@@ -116,11 +142,59 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="5">Aún no tienes productos. Crea el primero con "Nuevo producto".</td>
+              <td colspan="6">Aún no tienes productos. Crea el primero con "Nuevo producto".</td>
             </tr>
           }
         </tbody>
       </table>
     </div>
   }
+
+  <!-- Adiciones: extras con precio que el cliente le agrega a un producto -->
+  <section class="tarjeta" aria-labelledby="titulo-adiciones">
+    <div class="encabezado">
+      <div>
+        <h2 id="titulo-adiciones">Adiciones</h2>
+        <small>Extras con precio (granola, queso, helado…). En cada producto marcas cuáles admite.</small>
+      </div>
+      @if (editandoAdicion() === null) {
+        <button type="button" class="btn-secundario" (click)="nuevaAdicion()">+ Nueva adición</button>
+      }
+    </div>
+
+    @if (editandoAdicion() !== null) {
+      <form class="form-adicion" [formGroup]="formAdicion" (ngSubmit)="guardarAdicion()" aria-label="Adición">
+        <div class="campo">
+          <label for="nombreAdicion">Nombre</label>
+          <input id="nombreAdicion" formControlName="nombre" [maxlength]="maxNombre" required />
+        </div>
+        <div class="campo">
+          <label for="precioAdicion">Precio (pesos)</label>
+          <input id="precioAdicion" type="number" min="0" step="100" inputmode="numeric" formControlName="precio" />
+        </div>
+        <div class="campo campo-check">
+          <input id="activoAdicion" type="checkbox" formControlName="activo" />
+          <label for="activoAdicion">Disponible</label>
+        </div>
+        <div class="acciones">
+          <button type="submit" class="btn-principal" [disabled]="formAdicion.invalid">Guardar</button>
+          <button type="button" class="btn-secundario" (click)="cancelarAdicion()">Cancelar</button>
+        </div>
+      </form>
+    }
+
+    <ul class="lista-adiciones">
+      @for (a of adiciones(); track a.id) {
+        <li [class.inactivo]="!a.activo">
+          <span><strong>{{ a.nombre }}</strong> +{{ a.precio | pesos }} @if (!a.activo) { <em>(oculta)</em> }</span>
+          <span class="acciones">
+            <button type="button" class="btn-secundario" (click)="editarAdicion(a)">Editar</button>
+            <button type="button" class="btn-peligro" (click)="eliminarAdicion(a)">Eliminar</button>
+          </span>
+        </li>
+      } @empty {
+        <li>No hay adiciones.</li>
+      }
+    </ul>
+  </section>
 </div>
